@@ -10,7 +10,7 @@ export function StatStrip({ documents, entities, events, processors }: Props) {
     ["Documents", documents],
     ["Entities", entities],
     ["Timeline", events],
-    ["Tools", processors]
+    ["Tools", processors],
   ] as const;
 
   return (

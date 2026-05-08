@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MSG_FILE="${1:?commit message file required}"
+HEADER="$(head -n 1 "$MSG_FILE")"
+
+if [[ ! "$HEADER" =~ ^(feat|fix|docs|chore|refactor|test|ops|data)(\([a-zA-Z0-9_-]+\))?!?:\ .+ ]]; then
+  echo "Commit message must use Conventional Commits." >&2
+  echo "Example: feat: add evidence timeline" >&2
+  exit 1
+fi

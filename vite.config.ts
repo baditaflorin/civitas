@@ -26,17 +26,20 @@ export default defineConfig({
       output: {
         entryFileNames: "assets/[name]-[hash].js",
         chunkFileNames: "assets/[name]-[hash].js",
-        assetFileNames: "assets/[name]-[hash][extname]"
-      }
-    }
+        assetFileNames: "assets/[name]-[hash][extname]",
+      },
+    },
   },
   define: {
-    __APP_VERSION__: JSON.stringify(process.env.VITE_APP_VERSION ?? packageJson.version),
-    __COMMIT_SHA__: JSON.stringify(gitCommit())
+    __APP_VERSION__: JSON.stringify(
+      process.env.VITE_APP_VERSION ?? packageJson.version,
+    ),
+    __COMMIT_SHA__: JSON.stringify(gitCommit()),
   },
   test: {
     environment: "jsdom",
     setupFiles: "./src/test/setup.ts",
-    css: true
-  }
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+    css: true,
+  },
 });

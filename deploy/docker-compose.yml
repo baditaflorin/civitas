@@ -1,0 +1,76 @@
+services:
+  app:
+    image: ghcr.io/baditaflorin/civitas:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CIVITAS_ADDR: ":8080"
+      CIVITAS_STORAGE_DIR: "/var/lib/civitas"
+      CIVITAS_ALLOWED_ORIGINS: "https://baditaflorin.github.io"
+    volumes:
+      - civitas-storage:/var/lib/civitas
+    networks:
+      - civitas
+    healthcheck:
+      test: [ "CMD", "/civitas", "healthcheck" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4g
+
+  nginx:
+    image: macbre/nginx-brotli:1.27.4
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "25342:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    networks:
+      - civitas
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  prometheus:
+    image: prom/prometheus:v3.0.1
+    profiles: [ "observability" ]
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - civitas
+    ports:
+      - "127.0.0.1:9090:9090"
+
+volumes:
+  civitas-storage:
+  prometheus-data:
+
+networks:
+  civitas:
+    driver: bridge

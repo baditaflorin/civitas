@@ -24,6 +24,8 @@ temp/
 # Node
 node_modules/
 coverage/
+test-results/
+playwright-report/
 .eslintcache
 
 # Build outputs

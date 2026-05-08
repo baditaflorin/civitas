@@ -4,20 +4,22 @@ import { test, expect } from "vitest";
 import { CivitasWorkspace } from "./CivitasWorkspace";
 
 test("renders public project links and build metadata", () => {
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
   render(
     <QueryClientProvider client={client}>
       <CivitasWorkspace appVersion="0.1.0" commit="abc1234" />
-    </QueryClientProvider>
+    </QueryClientProvider>,
   );
 
   expect(screen.getByRole("link", { name: /star on github/i })).toHaveAttribute(
     "href",
-    "https://github.com/baditaflorin/civitas"
+    "https://github.com/baditaflorin/civitas",
   );
   expect(screen.getByRole("link", { name: /paypal/i })).toHaveAttribute(
     "href",
-    "https://www.paypal.com/paypalme/florinbadita"
+    "https://www.paypal.com/paypalme/florinbadita",
   );
   expect(screen.getByText(/v0.1.0 · abc1234/i)).toBeInTheDocument();
 });

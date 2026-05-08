@@ -1,0 +1,10 @@
+{
+  "case": "demo-civic-dump",
+  "documents": [
+    {
+      "filename": "contract-note.txt",
+      "entities": ["source@example.org", "42 Civic Street"],
+      "timeline": ["2026-05-08"]
+    }
+  ]
+}

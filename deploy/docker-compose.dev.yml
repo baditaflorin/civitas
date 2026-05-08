@@ -1,0 +1,23 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        VERSION: 0.1.0
+        COMMIT_SHA: dev
+    image: civitas:dev
+    environment:
+      CIVITAS_ENV: development
+      CIVITAS_ADDR: ":8080"
+      CIVITAS_STORAGE_DIR: "/var/lib/civitas"
+      CIVITAS_ALLOWED_ORIGINS: "http://localhost:5173,http://127.0.0.1:5173"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../storage:/var/lib/civitas
+
+  nginx:
+    ports:
+      - "8088:80"
+      - "25342:443"

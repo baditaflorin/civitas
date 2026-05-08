@@ -27,7 +27,9 @@ export class ErrorBoundary extends Component<Props, State> {
         <main className="grid min-h-screen place-items-center bg-paper p-6 text-ink">
           <section className="w-full max-w-xl rounded-lg border border-line bg-panel p-6 shadow-soft">
             <h1 className="text-2xl font-semibold">Civitas failed to start</h1>
-            <p className="mt-3 text-sm text-slate-700">{this.state.error.message}</p>
+            <p className="mt-3 text-sm text-slate-700">
+              {this.state.error.message}
+            </p>
           </section>
         </main>
       );

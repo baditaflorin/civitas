@@ -1,0 +1,34 @@
+{
+  "title": "Civitas",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "HTTP Requests",
+      "targets": [
+        {
+          "expr": "sum(rate(civitas_http_requests_total[5m])) by (status)"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Documents Processed",
+      "targets": [
+        {
+          "expr": "rate(civitas_documents_processed_total[5m])"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Exports Generated",
+      "targets": [
+        {
+          "expr": "sum(civitas_exports_generated_total)"
+        }
+      ]
+    }
+  ]
+}

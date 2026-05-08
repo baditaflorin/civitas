@@ -9,7 +9,7 @@ const demoNodes = [
   { id: "dump", type: "document", label: "Leak dump" },
   { id: "mail", type: "email", label: "source@example.org" },
   { id: "addr", type: "address", label: "42 Civic Street" },
-  { id: "date", type: "event", label: "2026-05-08" }
+  { id: "date", type: "event", label: "2026-05-08" },
 ];
 
 export function EvidenceMap({ graph, documents }: Props) {
@@ -19,25 +19,35 @@ export function EvidenceMap({ graph, documents }: Props) {
     : [
         { id: "a", source_id: "dump", target_id: "mail" },
         { id: "b", source_id: "dump", target_id: "addr" },
-        { id: "c", source_id: "dump", target_id: "date" }
+        { id: "c", source_id: "dump", target_id: "date" },
       ];
   const positions = nodes.map((node, index) => {
-    const angle = (index / Math.max(nodes.length, 1)) * Math.PI * 2 - Math.PI / 2;
+    const angle =
+      (index / Math.max(nodes.length, 1)) * Math.PI * 2 - Math.PI / 2;
     const radius = index === 0 ? 0 : 150;
     return {
       ...node,
       x: 280 + Math.cos(angle) * radius,
-      y: 190 + Math.sin(angle) * radius
+      y: 190 + Math.sin(angle) * radius,
     };
   });
 
   return (
     <div>
-      <svg className="h-[380px] w-full" viewBox="0 0 560 380" role="img" aria-label="Evidence relationship map">
+      <svg
+        className="h-[380px] w-full"
+        viewBox="0 0 560 380"
+        role="img"
+        aria-label="Evidence relationship map"
+      >
         <rect width="560" height="380" rx="8" fill="#f6f4ee" />
         {edges.map((edge) => {
-          const source = positions.find((node) => node.id === edge.source_id) ?? positions[0];
-          const target = positions.find((node) => node.id === edge.target_id) ?? positions[0];
+          const source =
+            positions.find((node) => node.id === edge.source_id) ??
+            positions[0];
+          const target =
+            positions.find((node) => node.id === edge.target_id) ??
+            positions[0];
           return (
             <line
               key={edge.id}

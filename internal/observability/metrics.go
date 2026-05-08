@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
 )
 
 type Metrics struct {
@@ -56,7 +57,7 @@ func NewMetrics() *Metrics {
 		m.DocumentsProcessed,
 		m.ExportsGenerated,
 	)
-	registry.MustRegister(prometheus.NewGoCollector())
+	registry.MustRegister(collectors.NewGoCollector())
 	return m
 }
 

@@ -10,12 +10,12 @@ export default {
         line: "#d8d2c3",
         civic: "#0b5cad",
         signal: "#bb4d00",
-        field: "#2f6f4e"
+        field: "#2f6f4e",
       },
       boxShadow: {
-        soft: "0 18px 60px rgba(23, 32, 42, 0.10)"
-      }
-    }
+        soft: "0 18px 60px rgba(23, 32, 42, 0.10)",
+      },
+    },
   },
-  plugins: []
+  plugins: [],
 };

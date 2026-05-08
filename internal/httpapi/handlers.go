@@ -90,6 +90,7 @@ func (a *API) listDocuments(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *API) uploadDocument(w http.ResponseWriter, r *http.Request) {
+	r.Body = http.MaxBytesReader(w, r.Body, 100<<20)
 	if err := r.ParseMultipartForm(100 << 20); err != nil {
 		writeJSON(w, http.StatusBadRequest, errorResponse{Code: "bad_request", Message: "multipart form required"})
 		return
@@ -197,7 +198,7 @@ func buildMarkdownExport(item evidence.Case, docs []evidence.Document) string {
 		if len(doc.Entities) > 0 {
 			builder.WriteString("Entities retained as categories, with direct contact details redacted.\n\n")
 			for _, entity := range doc.Entities {
-				builder.WriteString(fmt.Sprintf("- %s: %s\n", entity.Type, redact(entity.Value)))
+				fmt.Fprintf(&builder, "- %s: %s\n", entity.Type, redact(entity.Value))
 			}
 			builder.WriteString("\n")
 		}
