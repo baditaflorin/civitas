@@ -1,5 +1,9 @@
 # Civitas
 
+![GitHub Repo stars](https://img.shields.io/github/stars/baditaflorin/civitas?style=social)
+![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-live-0b5cad)
+![License](https://img.shields.io/badge/license-MIT-2f6f4e)
+
 Live site: https://baditaflorin.github.io/civitas/
 
 Repository: https://github.com/baditaflorin/civitas
@@ -7,6 +11,8 @@ Repository: https://github.com/baditaflorin/civitas
 Support the project: https://www.paypal.com/paypalme/florinbadita
 
 Civitas is a civic investigation OS for turning leaked document dumps into searchable, analyzable, publishable evidence.
+
+![Civitas dashboard preview](docs/demo.svg)
 
 ## Quickstart
 
@@ -34,12 +40,12 @@ flowchart LR
 
 ## Documentation
 
-- Architecture decisions: docs/adr/
-- Architecture overview: docs/architecture.md
-- API guide: docs/api.md
-- Deployment guide: deploy/README.md
-- Runbook: docs/runbook.md
-- Postmortem: docs/postmortem.md
+- Architecture decisions: https://github.com/baditaflorin/civitas/tree/main/docs/adr
+- Architecture overview: https://github.com/baditaflorin/civitas/blob/main/docs/architecture.md
+- API guide: https://github.com/baditaflorin/civitas/blob/main/docs/api.md
+- Deployment guide: https://github.com/baditaflorin/civitas/blob/main/deploy/README.md
+- Runbook: https://github.com/baditaflorin/civitas/blob/main/docs/runbook.md
+- Postmortem: https://github.com/baditaflorin/civitas/blob/main/docs/postmortem.md
 
 ## Git Hooks
 

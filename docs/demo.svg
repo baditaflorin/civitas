@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Civitas dashboard preview">
+  <rect width="1200" height="675" fill="#f6f4ee"/>
+  <rect x="40" y="40" width="1120" height="88" rx="8" fill="#fffdfa" stroke="#d8d2c3"/>
+  <text x="72" y="92" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#17202a">Civitas Investigation OS</text>
+  <rect x="40" y="156" width="285" height="460" rx="8" fill="#fffdfa" stroke="#d8d2c3"/>
+  <rect x="350" y="156" width="500" height="460" rx="8" fill="#fffdfa" stroke="#d8d2c3"/>
+  <rect x="875" y="156" width="285" height="460" rx="8" fill="#fffdfa" stroke="#d8d2c3"/>
+  <text x="72" y="205" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#17202a">Cases</text>
+  <text x="382" y="205" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#17202a">Evidence Map</text>
+  <text x="907" y="205" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#17202a">Processors</text>
+  <circle cx="600" cy="370" r="44" fill="#0b5cad"/>
+  <circle cx="500" cy="285" r="34" fill="#fffdfa" stroke="#bb4d00" stroke-width="4"/>
+  <circle cx="710" cy="292" r="34" fill="#fffdfa" stroke="#bb4d00" stroke-width="4"/>
+  <circle cx="540" cy="480" r="34" fill="#fffdfa" stroke="#bb4d00" stroke-width="4"/>
+  <circle cx="720" cy="480" r="34" fill="#fffdfa" stroke="#bb4d00" stroke-width="4"/>
+  <line x1="600" y1="370" x2="500" y2="285" stroke="#8d826f" stroke-width="4"/>
+  <line x1="600" y1="370" x2="710" y2="292" stroke="#8d826f" stroke-width="4"/>
+  <line x1="600" y1="370" x2="540" y2="480" stroke="#8d826f" stroke-width="4"/>
+  <line x1="600" y1="370" x2="720" y2="480" stroke="#8d826f" stroke-width="4"/>
+  <rect x="72" y="242" width="220" height="48" rx="8" fill="#f6f4ee" stroke="#d8d2c3"/>
+  <rect x="72" y="306" width="220" height="48" rx="8" fill="#e9f2ff" stroke="#0b5cad"/>
+  <rect x="907" y="242" width="190" height="34" rx="6" fill="#ecfdf3" stroke="#2f6f4e"/>
+  <rect x="907" y="292" width="190" height="34" rx="6" fill="#f1f5f9" stroke="#d8d2c3"/>
+  <rect x="907" y="342" width="190" height="34" rx="6" fill="#ecfdf3" stroke="#2f6f4e"/>
+</svg>
