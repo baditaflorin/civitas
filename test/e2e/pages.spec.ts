@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("loads the published investigation workspace", async ({ page }) => {
-  await page.goto("/");
+  await page.goto(".");
   await expect(page.getByRole("heading", { name: "Investigation OS" })).toBeVisible();
   await expect(page.getByRole("link", { name: /star on github/i })).toHaveAttribute(
     "href",
