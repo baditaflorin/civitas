@@ -94,4 +94,7 @@ hooks-commit-msg:
 	./.githooks/commit-msg .git/COMMIT_EDITMSG
 
 hooks-pre-push:
-	$(MAKE) test build smoke
+	$(MAKE) test build
+	@if ! git diff --quiet -- docs; then echo "Pages build changed docs/. Commit the build output before pushing."; git status --short docs; exit 1; fi
+	$(MAKE) smoke
+	@if ! git diff --quiet -- docs; then echo "Smoke test changed docs/. Commit the build output before pushing."; git status --short docs; exit 1; fi

@@ -44,6 +44,21 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
   const [searchTerm, setSearchTerm] = useState("corruption");
   const client = useMemo(() => createCivitasClient(endpoint), [endpoint]);
 
+  const githubCommitQuery = useQuery({
+    queryKey: ["github-main-commit"],
+    queryFn: async () => {
+      const response = await fetch(
+        "https://api.github.com/repos/baditaflorin/civitas/commits/main",
+      );
+      if (!response.ok) {
+        throw new Error("GitHub commit unavailable");
+      }
+      const payload = (await response.json()) as { sha?: string };
+      return payload.sha?.slice(0, 7) ?? commit;
+    },
+    staleTime: 300_000,
+  });
+
   const versionQuery = useQuery({
     queryKey: ["version", endpoint],
     queryFn: async () => {
@@ -228,7 +243,7 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
               <CircleDollarSign size={16} /> PayPal
             </a>
             <span className="version-pill">
-              v{appVersion} · {commit}
+              v{appVersion} · {githubCommitQuery.data ?? commit}
             </span>
           </nav>
         </div>
