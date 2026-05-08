@@ -18,7 +18,7 @@ type Store struct {
 }
 
 func New(root string) (*Store, error) {
-	if err := os.MkdirAll(filepath.Join(root, "cases"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(root, "cases"), 0o750); err != nil {
 		return nil, fmt.Errorf("create storage root: %w", err)
 	}
 	return &Store{root: root}, nil
@@ -36,7 +36,7 @@ func (s *Store) CreateCase(title, description string) (evidence.Case, error) {
 		UpdatedAt:   now,
 		DocumentIDs: []string{},
 	}
-	if err := os.MkdirAll(s.caseDir(item.ID), 0o755); err != nil {
+	if err := os.MkdirAll(s.caseDir(item.ID), 0o750); err != nil {
 		return evidence.Case{}, fmt.Errorf("create case dir: %w", err)
 	}
 	if err := writeJSON(s.casePath(item.ID), item); err != nil {
@@ -79,7 +79,7 @@ func (s *Store) AddDocument(caseID string, doc evidence.Document, content []byte
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(s.uploadDir(caseID), 0o755); err != nil {
+	if err := os.MkdirAll(s.uploadDir(caseID), 0o750); err != nil {
 		return fmt.Errorf("create upload dir: %w", err)
 	}
 	name := filepath.Base(doc.Filename)
@@ -165,7 +165,7 @@ func (s *Store) SaveExport(export evidence.Export) error {
 	if _, err := s.readCase(export.CaseID); err != nil {
 		return err
 	}
-	if err := os.MkdirAll(s.exportDir(export.CaseID), 0o755); err != nil {
+	if err := os.MkdirAll(s.exportDir(export.CaseID), 0o750); err != nil {
 		return fmt.Errorf("create export dir: %w", err)
 	}
 	path := filepath.Join(s.exportDir(export.CaseID), export.ID+".md")

@@ -39,6 +39,7 @@ func writeJSON(path string, value any) error {
 }
 
 func readJSON(path string, value any) error {
+	// #nosec G304 -- paths are constructed inside the storage root by Store methods.
 	body, err := os.ReadFile(path)
 	if err != nil {
 		return err

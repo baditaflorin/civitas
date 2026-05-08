@@ -12,6 +12,13 @@ linters:
     - misspell
     - unused
     - ineffassign
+  settings:
+    revive:
+      rules:
+        - name: exported
+          disabled: true
+        - name: package-comments
+          disabled: true
   exclusions:
     generated: lax
     rules:

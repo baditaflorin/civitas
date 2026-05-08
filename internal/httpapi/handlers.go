@@ -100,7 +100,9 @@ func (a *API) uploadDocument(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusBadRequest, errorResponse{Code: "bad_request", Message: "file field is required"})
 		return
 	}
-	defer file.Close()
+	defer func() {
+		_ = file.Close()
+	}()
 
 	content, err := io.ReadAll(io.LimitReader(file, 100<<20))
 	if err != nil {
