@@ -44,6 +44,6 @@ __pycache__/
 venv/
 
 # Runtime evidence storage
-storage/
-uploads/
-work/
+/storage/
+/uploads/
+/work/
