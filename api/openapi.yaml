@@ -1,0 +1,443 @@
+openapi: 3.1.0
+info:
+  title: Civitas API
+  version: 0.1.0
+  description: Runtime API for the Civitas civic investigation OS.
+servers:
+  - url: http://localhost:8080
+paths:
+  /healthz:
+    get:
+      operationId: getHealth
+      responses:
+        "200":
+          description: Healthy.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+  /readyz:
+    get:
+      operationId: getReady
+      responses:
+        "200":
+          description: Ready.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Status"
+  /api/v1/version:
+    get:
+      operationId: getVersion
+      responses:
+        "200":
+          description: Version details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VersionInfo"
+  /api/v1/processors:
+    get:
+      operationId: listProcessors
+      responses:
+        "200":
+          description: Processor registry.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [processors]
+                properties:
+                  processors:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ProcessorTool"
+  /api/v1/cases:
+    get:
+      operationId: listCases
+      responses:
+        "200":
+          description: Case list.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [cases]
+                properties:
+                  cases:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Case"
+    post:
+      operationId: createCase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+      responses:
+        "201":
+          description: Created case.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Case"
+  /api/v1/cases/{case_id}/documents:
+    parameters:
+      - $ref: "#/components/parameters/CaseID"
+    get:
+      operationId: listDocuments
+      responses:
+        "200":
+          description: Documents in a case.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [documents]
+                properties:
+                  documents:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Document"
+    post:
+      operationId: uploadDocument
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Uploaded and processed document.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+  /api/v1/cases/{case_id}/search:
+    parameters:
+      - $ref: "#/components/parameters/CaseID"
+    get:
+      operationId: searchCase
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Search results.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [results]
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SearchResult"
+  /api/v1/cases/{case_id}/graph:
+    parameters:
+      - $ref: "#/components/parameters/CaseID"
+    get:
+      operationId: getGraph
+      responses:
+        "200":
+          description: Evidence graph.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Graph"
+  /api/v1/cases/{case_id}/timeline:
+    parameters:
+      - $ref: "#/components/parameters/CaseID"
+    get:
+      operationId: getTimeline
+      responses:
+        "200":
+          description: Timeline events.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [events]
+                properties:
+                  events:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TimelineEvent"
+  /api/v1/cases/{case_id}/exports:
+    parameters:
+      - $ref: "#/components/parameters/CaseID"
+    post:
+      operationId: createExport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                format:
+                  type: string
+                  default: markdown
+      responses:
+        "201":
+          description: Generated export.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Export"
+  /api/v1/cases/{case_id}/exports/{export_id}:
+    parameters:
+      - $ref: "#/components/parameters/CaseID"
+      - name: export_id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getExport
+      responses:
+        "200":
+          description: Generated export body.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Export"
+components:
+  parameters:
+    CaseID:
+      name: case_id
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    Status:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+    VersionInfo:
+      type: object
+      required: [version, commit, mode]
+      properties:
+        version:
+          type: string
+        commit:
+          type: string
+        mode:
+          type: string
+    Case:
+      type: object
+      required: [id, title, description, created_at, updated_at, document_ids]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        document_ids:
+          type: array
+          items:
+            type: string
+    Document:
+      type: object
+      required:
+        - id
+        - case_id
+        - filename
+        - content_type
+        - size
+        - sha256
+        - status
+        - entities
+        - timeline
+        - processors
+        - created_at
+      properties:
+        id:
+          type: string
+        case_id:
+          type: string
+        filename:
+          type: string
+        content_type:
+          type: string
+        size:
+          type: integer
+          format: int64
+        sha256:
+          type: string
+        status:
+          type: string
+        text:
+          type: string
+        summary:
+          type: string
+        entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Entity"
+        timeline:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimelineEvent"
+        processors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProcessorStatus"
+        created_at:
+          type: string
+          format: date-time
+    Entity:
+      type: object
+      required: [id, type, value, confidence, source]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        value:
+          type: string
+        confidence:
+          type: number
+        source:
+          type: string
+    TimelineEvent:
+      type: object
+      required: [id, document_id, when, label, confidence]
+      properties:
+        id:
+          type: string
+        document_id:
+          type: string
+        when:
+          type: string
+          format: date-time
+        label:
+          type: string
+        confidence:
+          type: number
+    ProcessorStatus:
+      type: object
+      required: [name, kind, available, status]
+      properties:
+        name:
+          type: string
+        kind:
+          type: string
+        available:
+          type: boolean
+        status:
+          type: string
+        message:
+          type: string
+        started_at:
+          type: string
+          format: date-time
+        ended_at:
+          type: string
+          format: date-time
+    ProcessorTool:
+      type: object
+      required: [name, kind, command, available, description]
+      properties:
+        name:
+          type: string
+        kind:
+          type: string
+        command:
+          type: string
+        available:
+          type: boolean
+        description:
+          type: string
+    SearchResult:
+      type: object
+      required: [document_id, filename, snippet, score]
+      properties:
+        document_id:
+          type: string
+        filename:
+          type: string
+        snippet:
+          type: string
+        score:
+          type: number
+    Graph:
+      type: object
+      required: [nodes, edges]
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/GraphNode"
+        edges:
+          type: array
+          items:
+            $ref: "#/components/schemas/GraphEdge"
+    GraphNode:
+      type: object
+      required: [id, type, label]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        label:
+          type: string
+    GraphEdge:
+      type: object
+      required: [id, source_id, target_id, type, weight]
+      properties:
+        id:
+          type: string
+        source_id:
+          type: string
+        target_id:
+          type: string
+        type:
+          type: string
+        weight:
+          type: number
+    Export:
+      type: object
+      required: [id, case_id, format, path, created_at]
+      properties:
+        id:
+          type: string
+        case_id:
+          type: string
+        format:
+          type: string
+        path:
+          type: string
+        body:
+          type: string
+        created_at:
+          type: string
+          format: date-time

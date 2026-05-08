@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    background: #f6f4ee;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer components {
+  .link-button {
+    @apply inline-flex min-h-10 items-center gap-2 rounded-lg border border-line bg-paper px-3 py-2 font-semibold text-ink no-underline transition hover:border-civic hover:text-civic;
+  }
+
+  .version-pill {
+    @apply inline-flex min-h-10 items-center rounded-lg border border-line bg-ink px-3 py-2 font-mono text-xs text-white;
+  }
+
+  .primary-button {
+    @apply inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-lg bg-civic px-3 py-2 text-sm font-semibold text-white transition hover:bg-blue-800 disabled:cursor-not-allowed disabled:bg-slate-400;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none transition focus:border-civic focus:ring-2 focus:ring-civic/20;
+  }
+
+  .field-label {
+    @apply block text-sm font-semibold text-slate-700;
+  }
+
+  .muted {
+    @apply text-sm text-slate-600;
+  }
+
+  .case-row,
+  .case-row-active {
+    @apply flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition;
+  }
+
+  .case-row {
+    @apply border-line bg-white hover:border-civic;
+  }
+
+  .case-row-active {
+    @apply border-civic bg-blue-50 text-civic;
+  }
+
+  .result-row,
+  .document-row,
+  .timeline-row {
+    @apply rounded-lg border border-line bg-white p-3 text-sm;
+  }
+
+  .document-row {
+    @apply grid gap-1;
+  }
+
+  .document-row span,
+  .document-row small {
+    @apply text-slate-600;
+  }
+
+  .processor-list {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .processor-on,
+  .processor-off {
+    @apply rounded-md border px-2 py-1 text-xs font-semibold;
+  }
+
+  .processor-on {
+    @apply border-field bg-green-50 text-field;
+  }
+
+  .processor-off {
+    @apply border-line bg-slate-100 text-slate-600;
+  }
+
+  .status-dot-on,
+  .status-dot-off {
+    @apply mr-2 inline-block h-2.5 w-2.5 rounded-full;
+  }
+
+  .status-dot-on {
+    @apply bg-field;
+  }
+
+  .status-dot-off {
+    @apply bg-signal;
+  }
+
+  .export-preview {
+    @apply mt-3 max-h-56 overflow-auto rounded-lg border border-line bg-paper p-3 text-xs;
+  }
+}

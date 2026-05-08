@@ -1,0 +1,10 @@
+{
+  "name": "Civitas",
+  "short_name": "Civitas",
+  "start_url": "/civitas/",
+  "scope": "/civitas/",
+  "display": "standalone",
+  "background_color": "#f6f4ee",
+  "theme_color": "#f6f4ee",
+  "description": "Civic investigation OS for searchable evidence work."
+}
