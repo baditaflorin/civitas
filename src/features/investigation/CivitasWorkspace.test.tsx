@@ -26,5 +26,7 @@ test("renders public project links, build metadata, and completed controls", () 
   expect(screen.getByRole("button", { name: /upload paste/i })).toBeDisabled();
   expect(screen.getByRole("button", { name: /load sample/i })).toBeDisabled();
   expect(screen.getByText(/import state/i)).toBeVisible();
-  expect(screen.getByRole("button", { name: /download state/i })).toBeDisabled();
+  expect(
+    screen.getByRole("button", { name: /download state/i }),
+  ).toBeDisabled();
 });
