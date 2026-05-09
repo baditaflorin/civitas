@@ -1,0 +1,8 @@
+{
+  "shape": "ocds_json",
+  "state": "ready",
+  "min_confidence": 0.9,
+  "required_fields": ["ocid", "buyer", "tender_title", "tender_value"],
+  "required_timeline_dates": ["2010-03-15"],
+  "max_entities": 300
+}

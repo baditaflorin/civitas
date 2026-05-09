@@ -1,0 +1,7 @@
+{
+  "shape": "image_scan",
+  "state": "needs_processor",
+  "min_confidence": 0.75,
+  "required_anomaly_codes": ["ocr_processor_unavailable"],
+  "max_entities": 50
+}

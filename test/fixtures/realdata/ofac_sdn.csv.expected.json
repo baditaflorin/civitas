@@ -1,0 +1,9 @@
+{
+  "shape": "csv",
+  "state": "ready",
+  "min_confidence": 0.75,
+  "min_row_count": 10000,
+  "required_fields": ["column_1", "column_2"],
+  "max_entities": 300,
+  "required_anomaly_codes": ["csv_header_missing"]
+}

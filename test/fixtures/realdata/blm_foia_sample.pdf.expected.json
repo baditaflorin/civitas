@@ -1,0 +1,7 @@
+{
+  "shape": "pdf",
+  "state": "needs_processor",
+  "min_confidence": 0.7,
+  "required_anomaly_codes": ["pdf_text_processor_unavailable"],
+  "max_entities": 50
+}

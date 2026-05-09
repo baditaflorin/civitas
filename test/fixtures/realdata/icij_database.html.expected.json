@@ -1,0 +1,7 @@
+{
+  "shape": "html_data_source",
+  "state": "ready",
+  "min_confidence": 0.75,
+  "required_fields": ["title", "source_url"],
+  "forbidden_preview_prefix": "<!DOCTYPE html>"
+}

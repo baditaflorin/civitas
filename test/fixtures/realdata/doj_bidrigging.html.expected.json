@@ -1,0 +1,8 @@
+{
+  "shape": "html_article",
+  "state": "ready",
+  "min_confidence": 0.8,
+  "required_fields": ["title", "published_date"],
+  "required_timeline_dates": ["2026-02-10"],
+  "forbidden_preview_prefix": "<!DOCTYPE html>"
+}

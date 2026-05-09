@@ -1,0 +1,8 @@
+{
+  "shape": "audio",
+  "state": "needs_processor",
+  "min_confidence": 0.75,
+  "required_anomaly_codes": ["transcription_processor_unavailable"],
+  "min_size_bytes": 5000000,
+  "max_entities": 50
+}

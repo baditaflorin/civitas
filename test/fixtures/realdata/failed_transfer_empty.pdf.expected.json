@@ -1,0 +1,7 @@
+{
+  "shape": "empty",
+  "state": "failed",
+  "min_confidence": 1.0,
+  "required_anomaly_codes": ["empty_file"],
+  "max_entities": 0
+}

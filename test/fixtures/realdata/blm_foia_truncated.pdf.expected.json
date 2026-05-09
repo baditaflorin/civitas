@@ -1,0 +1,7 @@
+{
+  "shape": "pdf",
+  "state": "recoverable_error",
+  "min_confidence": 0.8,
+  "required_anomaly_codes": ["pdf_truncated_or_corrupt"],
+  "max_entities": 50
+}
