@@ -1,30 +1,40 @@
 import {
   Activity,
   CircleDollarSign,
+  Clipboard,
   Database,
+  Download,
   FileArchive,
+  FileInput,
   Github,
   GitPullRequestArrow,
   Link2,
+  Printer,
+  RotateCcw,
   Search,
   Server,
   Upload,
 } from "lucide-react";
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   apiError,
   createCivitasClient,
-  type CivitasCase,
-  type Document,
-  type ExportArtifact,
-  type Graph,
-  type ProcessorTool,
-  type SearchResult,
-  type TimelineEvent,
+  requireData,
+  type CaseState,
   type VersionInfo,
 } from "../../lib/api/client";
-import { readStoredEndpoint, writeStoredEndpoint } from "../../lib/config";
+import {
+  clearStoredSession,
+  defaultApiBaseUrl,
+  readStoredEndpoint,
+  readStoredSearchTerm,
+  readStoredSelectedCase,
+  writeStoredEndpoint,
+  writeStoredSearchTerm,
+  writeStoredSelectedCase,
+} from "../../lib/config";
+import { parseCaseState } from "../../lib/caseState";
 import { EvidenceMap } from "./EvidenceMap";
 import { StatStrip } from "./StatStrip";
 
@@ -40,8 +50,10 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
   const queryClient = useQueryClient();
   const [endpoint, setEndpoint] = useState(readStoredEndpoint);
   const [draftEndpoint, setDraftEndpoint] = useState(endpoint);
-  const [selectedCaseId, setSelectedCaseId] = useState<string>("");
-  const [searchTerm, setSearchTerm] = useState("corruption");
+  const [selectedCaseId, setSelectedCaseId] = useState(readStoredSelectedCase);
+  const [searchTerm, setSearchTerm] = useState(readStoredSearchTerm);
+  const [pasteText, setPasteText] = useState("");
+  const [workflowMessage, setWorkflowMessage] = useState("");
   const client = useMemo(() => createCivitasClient(endpoint), [endpoint]);
 
   const githubCommitQuery = useQuery({
@@ -62,46 +74,54 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
   const versionQuery = useQuery({
     queryKey: ["version", endpoint],
     queryFn: async () => {
-      const { data, error } = await client.GET("/api/v1/version");
-      if (error || !data) throw apiError(error, "Backend version unavailable");
-      return data as VersionInfo;
+      return requireData(
+        await client.GET("/api/v1/version"),
+        "Backend version unavailable",
+      );
     },
   });
 
   const processorsQuery = useQuery({
     queryKey: ["processors", endpoint],
     queryFn: async () => {
-      const { data, error } = await client.GET("/api/v1/processors");
-      if (error || !data)
-        throw apiError(error, "Processor registry unavailable");
-      return data.processors as ProcessorTool[];
+      return requireData(
+        await client.GET("/api/v1/processors"),
+        "Processor registry unavailable",
+      ).processors;
     },
   });
 
   const casesQuery = useQuery({
     queryKey: ["cases", endpoint],
     queryFn: async () => {
-      const { data, error } = await client.GET("/api/v1/cases");
-      if (error || !data) throw apiError(error, "Cases unavailable");
-      return data.cases as CivitasCase[];
+      return requireData(await client.GET("/api/v1/cases"), "Cases unavailable")
+        .cases;
     },
   });
 
   const cases = casesQuery.data ?? [];
   const activeCaseId = selectedCaseId || cases[0]?.id || "";
 
+  useEffect(() => {
+    if (activeCaseId) {
+      writeStoredSelectedCase(activeCaseId);
+    }
+  }, [activeCaseId]);
+
+  useEffect(() => {
+    writeStoredSearchTerm(searchTerm);
+  }, [searchTerm]);
+
   const documentsQuery = useQuery({
     queryKey: ["documents", endpoint, activeCaseId],
     enabled: activeCaseId.length > 0,
     queryFn: async () => {
-      const { data, error } = await client.GET(
-        "/api/v1/cases/{case_id}/documents",
-        {
+      return requireData(
+        await client.GET("/api/v1/cases/{case_id}/documents", {
           params: { path: { case_id: activeCaseId } },
-        },
-      );
-      if (error || !data) throw apiError(error, "Documents unavailable");
-      return data.documents as Document[];
+        }),
+        "Documents unavailable",
+      ).documents;
     },
   });
 
@@ -109,14 +129,12 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
     queryKey: ["graph", endpoint, activeCaseId],
     enabled: activeCaseId.length > 0,
     queryFn: async () => {
-      const { data, error } = await client.GET(
-        "/api/v1/cases/{case_id}/graph",
-        {
+      return requireData(
+        await client.GET("/api/v1/cases/{case_id}/graph", {
           params: { path: { case_id: activeCaseId } },
-        },
+        }),
+        "Graph unavailable",
       );
-      if (error || !data) throw apiError(error, "Graph unavailable");
-      return data as Graph;
     },
   });
 
@@ -124,14 +142,12 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
     queryKey: ["timeline", endpoint, activeCaseId],
     enabled: activeCaseId.length > 0,
     queryFn: async () => {
-      const { data, error } = await client.GET(
-        "/api/v1/cases/{case_id}/timeline",
-        {
+      return requireData(
+        await client.GET("/api/v1/cases/{case_id}/timeline", {
           params: { path: { case_id: activeCaseId } },
-        },
-      );
-      if (error || !data) throw apiError(error, "Timeline unavailable");
-      return data.events as TimelineEvent[];
+        }),
+        "Timeline unavailable",
+      ).events;
     },
   });
 
@@ -139,14 +155,12 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
     queryKey: ["search", endpoint, activeCaseId, searchTerm],
     enabled: activeCaseId.length > 0 && searchTerm.trim().length > 0,
     queryFn: async () => {
-      const { data, error } = await client.GET(
-        "/api/v1/cases/{case_id}/search",
-        {
+      return requireData(
+        await client.GET("/api/v1/cases/{case_id}/search", {
           params: { path: { case_id: activeCaseId }, query: { q: searchTerm } },
-        },
-      );
-      if (error || !data) throw apiError(error, "Search unavailable");
-      return data.results as SearchResult[];
+        }),
+        "Search unavailable",
+      ).results;
     },
   });
 
@@ -154,11 +168,12 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
     mutationFn: async (form: FormData) => {
       const title = String(form.get("title") ?? "").trim();
       const description = String(form.get("description") ?? "").trim();
-      const { data, error } = await client.POST("/api/v1/cases", {
-        body: { title, description },
-      });
-      if (error || !data) throw apiError(error, "Case creation failed");
-      return data as CivitasCase;
+      return requireData(
+        await client.POST("/api/v1/cases", {
+          body: { title, description },
+        }),
+        "Case creation failed",
+      );
     },
     onSuccess: (created) => {
       setSelectedCaseId(created.id);
@@ -166,47 +181,77 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
     },
   });
 
+  function invalidateEvidence(caseId = activeCaseId) {
+    void queryClient.invalidateQueries({
+      queryKey: ["documents", endpoint, caseId],
+    });
+    void queryClient.invalidateQueries({
+      queryKey: ["graph", endpoint, caseId],
+    });
+    void queryClient.invalidateQueries({
+      queryKey: ["timeline", endpoint, caseId],
+    });
+    void queryClient.invalidateQueries({
+      queryKey: ["search", endpoint, caseId],
+    });
+  }
+
   const uploadDocument = useMutation({
     mutationFn: async (file: File) => {
       const form = new FormData();
       form.append("file", file);
-      const { data, error } = await client.POST(
-        "/api/v1/cases/{case_id}/documents",
-        {
+      return requireData(
+        await client.POST("/api/v1/cases/{case_id}/documents", {
           params: { path: { case_id: activeCaseId } },
           body: form as never,
-        },
+        }),
+        "Upload failed",
       );
-      if (error || !data) throw apiError(error, "Upload failed");
-      return data as Document;
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: ["documents", endpoint, activeCaseId],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: ["graph", endpoint, activeCaseId],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: ["timeline", endpoint, activeCaseId],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: ["search", endpoint, activeCaseId],
-      });
+      invalidateEvidence();
     },
   });
 
   const createExport = useMutation({
     mutationFn: async () => {
-      const { data, error } = await client.POST(
-        "/api/v1/cases/{case_id}/exports",
-        {
+      return requireData(
+        await client.POST("/api/v1/cases/{case_id}/exports", {
           params: { path: { case_id: activeCaseId } },
           body: { format: "markdown" },
-        },
+        }),
+        "Export failed",
       );
-      if (error || !data) throw apiError(error, "Export failed");
-      return data as ExportArtifact;
+    },
+  });
+
+  const exportState = useMutation({
+    mutationFn: async () => {
+      return requireData(
+        await client.GET("/api/v1/cases/{case_id}/state", {
+          params: { path: { case_id: activeCaseId } },
+        }),
+        "State export failed",
+      );
+    },
+    onSuccess: (state) => {
+      downloadJSON(state, `${safeFilename(state.case.title)}-state.json`);
+      setWorkflowMessage("Case state downloaded.");
+    },
+  });
+
+  const importState = useMutation({
+    mutationFn: async (state: CaseState) => {
+      return requireData(
+        await client.POST("/api/v1/case-states/import", { body: state }),
+        "State import failed",
+      );
+    },
+    onSuccess: (item) => {
+      setSelectedCaseId(item.id);
+      setWorkflowMessage(`Imported ${item.title}.`);
+      void queryClient.invalidateQueries({ queryKey: ["cases", endpoint] });
+      invalidateEvidence(item.id);
     },
   });
 
@@ -220,6 +265,104 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
     event.preventDefault();
     writeStoredEndpoint(draftEndpoint);
     setEndpoint(draftEndpoint);
+    setWorkflowMessage("API endpoint saved.");
+  }
+
+  function resetSession() {
+    clearStoredSession();
+    setEndpoint(defaultApiBaseUrl);
+    setDraftEndpoint(defaultApiBaseUrl);
+    setSelectedCaseId("");
+    setSearchTerm("corruption");
+    setWorkflowMessage(
+      "Local UI state cleared. Backend evidence was not deleted.",
+    );
+  }
+
+  async function uploadFiles(files: File[]) {
+    if (!activeCaseId || files.length === 0) return;
+    let completed = 0;
+    const failed: string[] = [];
+    for (const file of files) {
+      setWorkflowMessage(
+        `Uploading ${file.name} (${completed + 1}/${files.length})...`,
+      );
+      try {
+        await uploadDocument.mutateAsync(file);
+        completed += 1;
+      } catch (error) {
+        failed.push(
+          `${file.name}: ${apiError(error, "Upload failed").message}`,
+        );
+      }
+    }
+    setWorkflowMessage(
+      failed.length
+        ? `Uploaded ${completed}/${files.length}. ${failed.join(" ")}`
+        : `Uploaded ${completed}/${files.length} file${completed === 1 ? "" : "s"}.`,
+    );
+  }
+
+  async function uploadPaste() {
+    const trimmed = pasteText.trim();
+    if (!trimmed || !activeCaseId) return;
+    const isHTML = /^<!doctype html|^<html|<body|<article|<table/i.test(
+      trimmed,
+    );
+    const extension = isHTML ? "html" : "txt";
+    const type = isHTML ? "text/html" : "text/plain";
+    const file = new File([trimmed], `pasted-evidence.${extension}`, { type });
+    await uploadFiles([file]);
+    setPasteText("");
+  }
+
+  async function loadSampleEvidence() {
+    if (!activeCaseId) return;
+    const response = await fetch(
+      `${import.meta.env.BASE_URL}data/v1/sample.json`,
+    );
+    if (!response.ok) {
+      setWorkflowMessage("Sample evidence could not be loaded.");
+      return;
+    }
+    const body = await response.text();
+    await uploadFiles([
+      new File([body], "civitas-sample.json", { type: "application/json" }),
+    ]);
+  }
+
+  async function importStateFile(file: File) {
+    try {
+      importState.mutate(parseCaseState(await file.text()));
+    } catch (error) {
+      setWorkflowMessage(apiError(error, "State import failed").message);
+    }
+  }
+
+  async function copyExport() {
+    if (!createExport.data?.body) return;
+    try {
+      await navigator.clipboard.writeText(createExport.data.body);
+      setWorkflowMessage("Safe export copied.");
+    } catch {
+      setWorkflowMessage("Clipboard permission was not available.");
+    }
+  }
+
+  function downloadExport() {
+    const body = createExport.data?.body;
+    if (!body) return;
+    downloadText(
+      body,
+      `${safeFilename(cases.find((item) => item.id === activeCaseId)?.title ?? "civitas-export")}.md`,
+    );
+    setWorkflowMessage("Safe export downloaded.");
+  }
+
+  function printExport() {
+    const body = createExport.data?.body;
+    if (!body) return;
+    printText(body);
   }
 
   return (
@@ -251,7 +394,7 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
 
       <section className="mx-auto grid max-w-7xl gap-4 px-4 py-5 xl:grid-cols-[320px_1fr_340px]">
         <aside className="space-y-4">
-          <Panel title="Backend" icon={<Server size={18} />}>
+          <Panel title="Settings" icon={<Server size={18} />}>
             <form className="space-y-3" onSubmit={saveEndpoint}>
               <label className="field-label" htmlFor="endpoint">
                 API endpoint
@@ -266,7 +409,19 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
                 <Link2 size={16} /> Connect
               </button>
             </form>
+            <button
+              className="secondary-button mt-3"
+              type="button"
+              onClick={resetSession}
+            >
+              <RotateCcw size={16} /> Start fresh
+            </button>
             <StatusLine connected={connected} version={versionQuery.data} />
+            {workflowMessage && (
+              <p className="muted mt-3" aria-live="polite">
+                {workflowMessage}
+              </p>
+            )}
           </Panel>
 
           <Panel title="Cases" icon={<Database size={18} />}>
@@ -349,15 +504,67 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
 
         <aside className="space-y-4">
           <Panel title="Upload" icon={<Upload size={18} />}>
-            <input
-              className="input"
-              type="file"
-              disabled={!activeCaseId || uploadDocument.isPending}
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                if (file) uploadDocument.mutate(file);
+            <div
+              className="drop-zone"
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={(event) => {
+                event.preventDefault();
+                void uploadFiles(Array.from(event.dataTransfer.files));
               }}
+            >
+              <input
+                className="input"
+                type="file"
+                multiple
+                disabled={!activeCaseId || uploadDocument.isPending}
+                onChange={(event) => {
+                  void uploadFiles(Array.from(event.target.files ?? []));
+                  event.currentTarget.value = "";
+                }}
+              />
+              <p className="muted mt-3">
+                Drop files here, select several files, or use the paste box.
+              </p>
+            </div>
+            <textarea
+              className="input mt-3 min-h-20"
+              value={pasteText}
+              onChange={(event) => setPasteText(event.target.value)}
+              placeholder="Paste text or HTML evidence"
+              disabled={!activeCaseId || uploadDocument.isPending}
             />
+            <div className="mt-3 grid gap-2">
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={!activeCaseId || !pasteText.trim()}
+                onClick={() => void uploadPaste()}
+              >
+                <Clipboard size={16} /> Upload paste
+              </button>
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={!activeCaseId}
+                onClick={() => void loadSampleEvidence()}
+              >
+                <FileInput size={16} /> Load sample
+              </button>
+              <label className="secondary-button">
+                <FileInput size={16} /> Import state
+                <input
+                  className="sr-only"
+                  type="file"
+                  accept="application/json"
+                  disabled={importState.isPending}
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file) void importStateFile(file);
+                    event.currentTarget.value = "";
+                  }}
+                />
+              </label>
+            </div>
             <p className="muted" aria-live="polite">
               {uploadDocument.isPending
                 ? "Processing evidence..."
@@ -417,7 +624,43 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
               <FileArchive size={16} /> Safe export
             </button>
             {createExport.data?.body && (
-              <pre className="export-preview">{createExport.data.body}</pre>
+              <>
+                <div className="mt-3 grid gap-2">
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    onClick={() => void copyExport()}
+                  >
+                    <Clipboard size={16} /> Copy export
+                  </button>
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    onClick={downloadExport}
+                  >
+                    <Download size={16} /> Download markdown
+                  </button>
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    onClick={printExport}
+                  >
+                    <Printer size={16} /> Print export
+                  </button>
+                </div>
+                <pre className="export-preview">{createExport.data.body}</pre>
+              </>
+            )}
+            <button
+              className="secondary-button mt-3"
+              type="button"
+              disabled={!activeCaseId || exportState.isPending}
+              onClick={() => exportState.mutate()}
+            >
+              <Download size={16} /> Download state
+            </button>
+            {activeCaseId && (
+              <pre className="export-preview">{`curl -s ${endpoint.replace(/\/$/, "")}/api/v1/cases/${activeCaseId}/state > civitas-case-state.json`}</pre>
             )}
           </Panel>
         </aside>
@@ -461,4 +704,48 @@ function StatusLine({
         : "Backend offline"}
     </div>
   );
+}
+
+function downloadJSON(value: CaseState, filename: string) {
+  downloadText(JSON.stringify(value, null, 2), filename, "application/json");
+}
+
+function downloadText(
+  body: string,
+  filename: string,
+  type = "text/markdown;charset=utf-8",
+) {
+  const url = URL.createObjectURL(new Blob([body], { type }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function printText(body: string) {
+  const popup = window.open("", "_blank", "noopener,noreferrer");
+  if (!popup) return;
+  popup.document.write(
+    `<pre style="white-space:pre-wrap;font:14px/1.5 ui-monospace,Menlo,monospace;">${escapeHTML(body)}</pre>`,
+  );
+  popup.document.close();
+  popup.focus();
+  popup.print();
+}
+
+function escapeHTML(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function safeFilename(value: string) {
+  const cleaned = value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+  return cleaned || "civitas";
 }

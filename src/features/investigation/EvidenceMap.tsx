@@ -86,7 +86,7 @@ export function EvidenceMap({ graph, documents }: Props) {
       <p className="muted mt-3">
         {documents.length
           ? `${documents.length} source documents mapped`
-          : "Demo map shown until a backend case is selected"}
+          : "Example layout shown until evidence is uploaded"}
       </p>
     </div>
   );

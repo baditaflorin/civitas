@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { test, expect } from "vitest";
 import { CivitasWorkspace } from "./CivitasWorkspace";
 
-test("renders public project links and build metadata", () => {
+test("renders public project links, build metadata, and completed controls", () => {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
@@ -22,4 +22,9 @@ test("renders public project links and build metadata", () => {
     "https://www.paypal.com/paypalme/florinbadita",
   );
   expect(screen.getByText(/v0.2.0 · abc1234/i)).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /start fresh/i })).toBeVisible();
+  expect(screen.getByRole("button", { name: /upload paste/i })).toBeDisabled();
+  expect(screen.getByRole("button", { name: /load sample/i })).toBeDisabled();
+  expect(screen.getByText(/import state/i)).toBeVisible();
+  expect(screen.getByRole("button", { name: /download state/i })).toBeDisabled();
 });
