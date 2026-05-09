@@ -80,6 +80,36 @@ Smart Civitas means:
 6. Export provenance: 10/10 exports include source ID, schema version, app version, processor decisions, confidence summary, and parameters used.
 7. Performance: median time from upload completion to first useful preview is under 1 second for text/CSV/JSON/HTML fixtures; heavy media enters a queued state within 300 ms.
 
+## After Phase 2 Implementation Check
+
+Date: 2026-05-09
+
+Command: `CGO_ENABLED=0 go test ./internal/pipeline -run 'TestRealDataFixtures' -count=1 -v`
+
+Result: 10/10 fixture contracts passed. The audit pass rate moved from 0/10 useful results in v1 to 10/10 useful states or first guesses in v0.2.0. Four fixtures now produce ready extracted evidence, three correctly enter `needs_processor`, two correctly enter `recoverable_error`, and one correctly enters `failed`.
+
+| ID | v0.2.0 shape | v0.2.0 state | Useful outcome |
+| --- | --- | --- | --- |
+| R01 | `csv` | `ready` | Delimiter, headers, row count, field types, preview, confidence, and capped graph input. |
+| R02 | `ocds_json` | `ready` | OCID, buyer, tender title, tender value, currency, release date, and timeline. |
+| R03 | `html_article` | `ready` | Boilerplate-stripped text, title/date fields, URL/money/date entities, and timeline. |
+| R04 | `html_data_source` | `ready` | Data-source page recognized instead of raw page chrome. |
+| R05 | `pdf` | `needs_processor` | Valid PDF is not marked complete; next step names document processors. |
+| R06 | `image_scan` | `needs_processor` | Scan is not marked complete; next step names OCR processors. |
+| R07 | `audio` | `needs_processor` | Large audio is classified quickly and requires transcription processors instead of pretending text exists. |
+| R08 | `archive_zip` | `recoverable_error` | Partial ZIP is reported as corrupt/truncated with re-upload guidance. |
+| R09 | `pdf` | `recoverable_error` | Truncated PDF is separated from a valid PDF processor fallback. |
+| R10 | `empty` | `failed` | Zero-byte upload is treated as failed transfer. |
+
+Metric status:
+
+- Useful-result pass rate: 10/10.
+- No silent wrongness: 10/10 expose confidence, state, and actionable anomalies where needed.
+- Determinism: 10/10 pass `TestRealDataFixturesAreDeterministic`.
+- Format detection: 10/10.
+- Export provenance: implemented in markdown exports with schema version, app version, commit, source IDs, source SHA-256 values, confidence, processor parameters, and redaction.
+- Performance: median fixture subtest duration is below 10 ms; p95/worst is the OFAC CSV at about 1.99 seconds in the combined fixture run. Large audio enters `needs_processor` in about 70 ms.
+
 ## Out Of Scope For Phase 2 Substance
 
 - No new user-facing feature areas.

@@ -73,14 +73,18 @@ func TestStoreCaseDocumentSearchGraphTimelineAndExport(t *testing.T) {
 		t.Fatalf("unexpected timeline: %#v", events)
 	}
 
-	if err := store.SaveExport(evidence.Export{
+	savedExport, err := store.SaveExport(evidence.Export{
 		ID:        "export_test",
 		CaseID:    item.ID,
 		Format:    "markdown",
 		Body:      "# Export",
 		CreatedAt: time.Now().UTC(),
-	}); err != nil {
+	})
+	if err != nil {
 		t.Fatalf("save export: %v", err)
+	}
+	if savedExport.Path == "" {
+		t.Fatal("saved export path is empty")
 	}
 
 	exported, err := store.ReadExport(item.ID, "export_test")

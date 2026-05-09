@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Civitas API
-  version: 0.1.0
+  version: 0.2.0
   description: Runtime API for the Civitas civic investigation OS.
 servers:
   - url: http://localhost:8080
@@ -180,6 +180,26 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/TimelineEvent"
+  /api/v1/cases/{case_id}/debug:
+    parameters:
+      - $ref: "#/components/parameters/CaseID"
+    get:
+      operationId: debugCase
+      responses:
+        "200":
+          description: Debug document inference state.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [documents, count]
+                properties:
+                  documents:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Document"
+                  count:
+                    type: integer
   /api/v1/cases/{case_id}/exports:
     parameters:
       - $ref: "#/components/parameters/CaseID"
@@ -274,9 +294,16 @@ components:
         - size
         - sha256
         - status
+        - shape
+        - state
+        - confidence
+        - fields
+        - anomalies
         - entities
         - timeline
         - processors
+        - provenance
+        - parse
         - created_at
       properties:
         id:
@@ -294,10 +321,26 @@ components:
           type: string
         status:
           type: string
+        shape:
+          type: string
+        state:
+          type: string
+        confidence:
+          type: number
         text:
+          type: string
+        preview:
           type: string
         summary:
           type: string
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldInference"
+        anomalies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Anomaly"
         entities:
           type: array
           items:
@@ -310,9 +353,88 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProcessorStatus"
+        provenance:
+          $ref: "#/components/schemas/Provenance"
+        parse:
+          $ref: "#/components/schemas/ParseMetrics"
         created_at:
           type: string
           format: date-time
+    FieldInference:
+      type: object
+      required: [id, name, type, value, confidence, reason]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        value:
+          type: string
+        normalized:
+          type: string
+        confidence:
+          type: number
+        reason:
+          type: string
+    Anomaly:
+      type: object
+      required: [id, code, severity, message, why, next_step, confidence]
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+        severity:
+          type: string
+        message:
+          type: string
+        why:
+          type: string
+        next_step:
+          type: string
+        confidence:
+          type: number
+    Provenance:
+      type: object
+      required:
+        [
+          schema_version,
+          app_version,
+          source_id,
+          source_name,
+          source_sha256,
+          parameters,
+        ]
+      properties:
+        schema_version:
+          type: string
+        app_version:
+          type: string
+        source_id:
+          type: string
+        source_name:
+          type: string
+        source_sha256:
+          type: string
+        parameters:
+          type: array
+          items:
+            type: string
+    ParseMetrics:
+      type: object
+      required: [duration_ms, size_bucket]
+      properties:
+        duration_ms:
+          type: integer
+          format: int64
+        size_bucket:
+          type: string
+        row_count:
+          type: integer
+        field_count:
+          type: integer
     Entity:
       type: object
       required: [id, type, value, confidence, source]

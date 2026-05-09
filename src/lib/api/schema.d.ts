@@ -156,6 +156,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/cases/{case_id}/debug": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        case_id: components["parameters"]["CaseID"];
+      };
+      cookie?: never;
+    };
+    get: operations["debugCase"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/cases/{case_id}/exports": {
     parameters: {
       query?: never;
@@ -224,13 +242,54 @@ export interface components {
       size: number;
       sha256: string;
       status: string;
+      shape: string;
+      state: string;
+      confidence: number;
       text?: string;
+      preview?: string;
       summary?: string;
+      fields: components["schemas"]["FieldInference"][];
+      anomalies: components["schemas"]["Anomaly"][];
       entities: components["schemas"]["Entity"][];
       timeline: components["schemas"]["TimelineEvent"][];
       processors: components["schemas"]["ProcessorStatus"][];
+      provenance: components["schemas"]["Provenance"];
+      parse: components["schemas"]["ParseMetrics"];
       /** Format: date-time */
       created_at: string;
+    };
+    FieldInference: {
+      id: string;
+      name: string;
+      type: string;
+      value: string;
+      normalized?: string;
+      confidence: number;
+      reason: string;
+    };
+    Anomaly: {
+      id: string;
+      code: string;
+      severity: string;
+      message: string;
+      why: string;
+      next_step: string;
+      confidence: number;
+    };
+    Provenance: {
+      schema_version: string;
+      app_version: string;
+      source_id: string;
+      source_name: string;
+      source_sha256: string;
+      parameters: string[];
+    };
+    ParseMetrics: {
+      /** Format: int64 */
+      duration_ms: number;
+      size_bucket: string;
+      row_count?: number;
+      field_count?: number;
     };
     Entity: {
       id: string;
@@ -558,6 +617,31 @@ export interface operations {
         content: {
           "application/json": {
             events: components["schemas"]["TimelineEvent"][];
+          };
+        };
+      };
+    };
+  };
+  debugCase: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        case_id: components["parameters"]["CaseID"];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Debug document inference state. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            documents: components["schemas"]["Document"][];
+            count: number;
           };
         };
       };

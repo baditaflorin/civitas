@@ -75,6 +75,14 @@ func entityText(entities []evidence.Entity) string {
 	return strings.Join(values, " ")
 }
 
+func fieldText(fields []evidence.FieldInference) string {
+	values := make([]string, 0, len(fields))
+	for _, field := range fields {
+		values = append(values, field.Name, field.Value, field.Normalized)
+	}
+	return strings.Join(values, " ")
+}
+
 func snippet(text, query string) string {
 	clean := strings.Join(strings.Fields(text), " ")
 	lower := strings.ToLower(clean)

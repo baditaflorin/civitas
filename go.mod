@@ -8,6 +8,7 @@ require (
 	github.com/go-playground/validator/v10 v10.28.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/prometheus/client_golang v1.23.2
+	golang.org/x/net v0.45.0
 )
 
 require (

@@ -19,12 +19,40 @@ type Document struct {
 	Size        int64             `json:"size"`
 	SHA256      string            `json:"sha256"`
 	Status      string            `json:"status"`
+	Shape       string            `json:"shape"`
+	State       string            `json:"state"`
+	Confidence  float64           `json:"confidence"`
 	Text        string            `json:"text,omitempty"`
+	Preview     string            `json:"preview,omitempty"`
 	Summary     string            `json:"summary,omitempty"`
+	Fields      []FieldInference  `json:"fields"`
+	Anomalies   []Anomaly         `json:"anomalies"`
 	Entities    []Entity          `json:"entities"`
 	Timeline    []TimelineEvent   `json:"timeline"`
 	Processors  []ProcessorStatus `json:"processors"`
+	Provenance  Provenance        `json:"provenance"`
+	Parse       ParseMetrics      `json:"parse"`
 	CreatedAt   time.Time         `json:"created_at"`
+}
+
+type FieldInference struct {
+	ID         string  `json:"id"`
+	Name       string  `json:"name"`
+	Type       string  `json:"type"`
+	Value      string  `json:"value"`
+	Normalized string  `json:"normalized,omitempty"`
+	Confidence float64 `json:"confidence"`
+	Reason     string  `json:"reason"`
+}
+
+type Anomaly struct {
+	ID         string  `json:"id"`
+	Code       string  `json:"code"`
+	Severity   string  `json:"severity"`
+	Message    string  `json:"message"`
+	Why        string  `json:"why"`
+	NextStep   string  `json:"next_step"`
+	Confidence float64 `json:"confidence"`
 }
 
 type Entity struct {
@@ -61,6 +89,22 @@ type ProcessorStatus struct {
 	Message   string    `json:"message,omitempty"`
 	StartedAt time.Time `json:"started_at,omitempty"`
 	EndedAt   time.Time `json:"ended_at,omitempty"`
+}
+
+type Provenance struct {
+	SchemaVersion string   `json:"schema_version"`
+	AppVersion    string   `json:"app_version"`
+	SourceID      string   `json:"source_id"`
+	SourceName    string   `json:"source_name"`
+	SourceSHA256  string   `json:"source_sha256"`
+	Parameters    []string `json:"parameters"`
+}
+
+type ParseMetrics struct {
+	DurationMS int64  `json:"duration_ms"`
+	SizeBucket string `json:"size_bucket"`
+	RowCount   int    `json:"row_count,omitempty"`
+	FieldCount int    `json:"field_count,omitempty"`
 }
 
 type SearchResult struct {

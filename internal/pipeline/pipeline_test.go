@@ -16,8 +16,8 @@ func TestAnalyzeExtractsInvestigationSignals(t *testing.T) {
 		[]byte("Payment due on 2026-05-08 from source@example.org at 42 Civic Street for EUR 1200."),
 	)
 
-	if doc.Status != "completed" {
-		t.Fatalf("expected completed document, got %s", doc.Status)
+	if doc.State != "ready" {
+		t.Fatalf("expected ready document, got %s", doc.State)
 	}
 	if !strings.Contains(doc.Text, "source@example.org") {
 		t.Fatalf("expected extracted text to contain email, got %q", doc.Text)

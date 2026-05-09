@@ -370,8 +370,14 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
               {documents.map((doc) => (
                 <article key={doc.id} className="document-row">
                   <strong>{doc.filename}</strong>
-                  <span>{doc.content_type}</span>
+                  <span>
+                    {doc.shape ?? doc.content_type} · {doc.state ?? doc.status}{" "}
+                    · {Math.round((doc.confidence ?? 0) * 100)}%
+                  </span>
                   <small>{doc.sha256.slice(0, 12)}</small>
+                  {(doc.anomalies ?? []).slice(0, 1).map((anomaly) => (
+                    <small key={anomaly.id}>{anomaly.message}</small>
+                  ))}
                 </article>
               ))}
               {documents.length === 0 && (

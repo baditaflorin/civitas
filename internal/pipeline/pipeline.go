@@ -3,21 +3,33 @@ package pipeline
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"net/http"
-	"regexp"
-	"sort"
+	"path/filepath"
 	"strings"
 	"time"
-	"unicode/utf8"
 
 	"github.com/baditaflorin/civitas/internal/evidence"
 	"github.com/baditaflorin/civitas/internal/observability"
 )
 
+const schemaVersion = "phase2.v1"
+
 type Pipeline struct {
 	registry Registry
 	metrics  *observability.Metrics
+}
+
+type analysisResult struct {
+	shape      string
+	state      string
+	text       string
+	preview    string
+	summary    string
+	confidence float64
+	fields     []evidence.FieldInference
+	anomalies  []evidence.Anomaly
+	timeline   []evidence.TimelineEvent
+	parse      evidence.ParseMetrics
 }
 
 func New(registry Registry, metrics *observability.Metrics) *Pipeline {
@@ -31,43 +43,86 @@ func (p *Pipeline) Tools() []Tool {
 func (p *Pipeline) Analyze(caseID, docID, filename string, content []byte) evidence.Document {
 	started := time.Now().UTC()
 	p.metrics.IngestionJobsStarted.Inc()
-	contentType := http.DetectContentType(content)
+	contentType := detectContentType(content)
 	hash := sha256.Sum256(content)
+	hashText := hex.EncodeToString(hash[:])
 
-	text := extractReadableText(content, contentType)
-	entities := extractEntities(docID, text)
-	timeline := extractTimeline(docID, text)
-	processors := p.processorStatuses(started)
+	result := p.analyzeContent(docID, filename, contentType, content)
+	entities := extractEntities(docID, entityExtractionText(result))
+	processors := p.processorStatuses(started, result.shape, result.state)
 
 	doc := evidence.Document{
 		ID:          docID,
 		CaseID:      caseID,
-		Filename:    filename,
+		Filename:    filepath.Base(filename),
 		ContentType: contentType,
 		Size:        int64(len(content)),
-		SHA256:      hex.EncodeToString(hash[:]),
-		Status:      "completed",
-		Text:        text,
-		Summary:     summarize(filename, text, entities),
+		SHA256:      hashText,
+		Status:      result.state,
+		Shape:       result.shape,
+		State:       result.state,
+		Confidence:  result.confidence,
+		Text:        result.text,
+		Preview:     result.preview,
+		Summary:     result.summary,
+		Fields:      sortedFields(result.fields),
+		Anomalies:   sortedAnomalies(result.anomalies),
 		Entities:    entities,
-		Timeline:    timeline,
+		Timeline:    result.timeline,
 		Processors:  processors,
-		CreatedAt:   started,
+		Provenance: evidence.Provenance{
+			SchemaVersion: schemaVersion,
+			AppVersion:    "0.2.0",
+			SourceID:      docID,
+			SourceName:    filepath.Base(filename),
+			SourceSHA256:  hashText,
+			Parameters:    []string{"phase2-classifier", "deterministic-heuristics"},
+		},
+		Parse:     result.parse,
+		CreatedAt: started,
 	}
 	p.metrics.DocumentsProcessed.Inc()
 	p.metrics.IngestionJobsCompleted.Inc()
 	return doc
 }
 
-func (p *Pipeline) processorStatuses(started time.Time) []evidence.ProcessorStatus {
+func detectContentType(content []byte) string {
+	if len(content) == 0 {
+		return "application/x-empty"
+	}
+	return http.DetectContentType(content)
+}
+
+func (p *Pipeline) analyzeContent(docID, filename, contentType string, content []byte) analysisResult {
+	begin := time.Now()
+	shape := classifyShape(filename, contentType, content)
+	result := analyzeByShape(docID, filename, contentType, shape, content)
+	result.shape = shape
+	result.parse.DurationMS = time.Since(begin).Milliseconds()
+	result.parse.SizeBucket = sizeBucket(len(content))
+	if result.preview == "" {
+		result.preview = preview(result.text)
+	}
+	if result.summary == "" {
+		result.summary = summarize(filename, result)
+	}
+	result.timeline = sortedTimeline(append(result.timeline, extractTimeline(docID, result.text)...))
+	result.anomalies = append(result.anomalies, processorAnomalies(shape, p.registry)...)
+	if result.state != "failed" {
+		result.confidence = clampConfidence(result.confidence, result.anomalies)
+	}
+	return result
+}
+
+func (p *Pipeline) processorStatuses(started time.Time, shape, state string) []evidence.ProcessorStatus {
 	tools := p.registry.Tools()
 	statuses := make([]evidence.ProcessorStatus, 0, len(tools)+1)
 	for _, tool := range tools {
-		status := "skipped"
-		msg := "adapter boundary present; native command not installed"
-		if tool.Available {
-			status = "available"
-			msg = "native command discovered"
+		status := "available"
+		msg := "native command discovered"
+		if !tool.Available {
+			status = "missing"
+			msg = "native command not installed"
 		}
 		statuses = append(statuses, evidence.ProcessorStatus{
 			Name:      tool.Name,
@@ -80,127 +135,34 @@ func (p *Pipeline) processorStatuses(started time.Time) []evidence.ProcessorStat
 		})
 	}
 	statuses = append(statuses, evidence.ProcessorStatus{
-		Name:      "Civitas fallback extractor",
-		Kind:      "text-entities-timeline",
+		Name:      "Civitas Phase 2 inference engine",
+		Kind:      "classification-normalization-confidence",
 		Available: true,
-		Status:    "completed",
-		Message:   "processed text-compatible content and generated v1 investigative signals",
+		Status:    state,
+		Message:   "classified evidence as " + shape,
 		StartedAt: started,
 		EndedAt:   time.Now().UTC(),
 	})
 	return statuses
 }
 
-func extractReadableText(content []byte, contentType string) string {
-	if len(content) == 0 {
-		return ""
+func summarize(filename string, result analysisResult) string {
+	parts := []string{filepath.Base(filename), result.shape, result.state}
+	if result.preview != "" {
+		parts = append(parts, preview(result.preview))
 	}
-	text := string(content)
-	if utf8.Valid(content) && printableRatio(text) > 0.75 {
-		return strings.TrimSpace(text)
+	if len(result.anomalies) > 0 {
+		parts = append(parts, result.anomalies[0].Message)
 	}
-	if strings.Contains(contentType, "pdf") {
-		return "PDF evidence uploaded. Configure Tika, PyMuPDF, pdfminer, qpdf, or Ghostscript in the backend image for full text extraction."
-	}
-	if strings.HasPrefix(contentType, "image/") {
-		return "Image evidence uploaded. Configure Tesseract, ImageMagick, dlib, or MediaPipe in the backend image for OCR and redaction."
-	}
-	if strings.HasPrefix(contentType, "audio/") || strings.HasPrefix(contentType, "video/") {
-		return "Media evidence uploaded. Configure Whisper.cpp, pyannote, and NLLB-200 in the backend image for transcription and translation."
-	}
-	return fmt.Sprintf("Binary evidence uploaded with detected content type %s.", contentType)
+	return strings.Join(parts, ": ")
 }
 
-func printableRatio(text string) float64 {
-	if text == "" {
-		return 0
+func entityExtractionText(result analysisResult) string {
+	if result.shape == "csv" {
+		return result.preview + " " + strings.Join(fieldValues(result.fields), " ")
 	}
-	printable := 0
-	total := 0
-	for _, r := range text {
-		total++
-		if r == '\n' || r == '\r' || r == '\t' || (r >= 32 && r < 127) {
-			printable++
-		}
+	if len(result.text) > 200_000 {
+		return previewLong(result.text, 200_000)
 	}
-	return float64(printable) / float64(total)
-}
-
-func extractEntities(docID, text string) []evidence.Entity {
-	patterns := map[string]*regexp.Regexp{
-		"email":   regexp.MustCompile(`(?i)\b[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}\b`),
-		"phone":   regexp.MustCompile(`\b(?:\+?\d[\d .()\-]{7,}\d)\b`),
-		"money":   regexp.MustCompile(`(?i)\b(?:EUR|USD|RON|GBP|\$|€)\s?[0-9][0-9,.\s]*\b`),
-		"address": regexp.MustCompile(`(?im)\b\d{1,5}\s+[A-Za-z0-9 .'\-]+(?:Street|St|Road|Rd|Avenue|Ave|Boulevard|Blvd|Lane|Ln|Square|Sq)\b`),
-	}
-	seen := map[string]bool{}
-	var out []evidence.Entity
-	for kind, pattern := range patterns {
-		for _, match := range pattern.FindAllString(text, -1) {
-			value := strings.TrimSpace(match)
-			key := kind + ":" + strings.ToLower(value)
-			if seen[key] {
-				continue
-			}
-			seen[key] = true
-			out = append(out, evidence.Entity{
-				ID:         stableID(kind, value),
-				Type:       kind,
-				Value:      value,
-				Confidence: 0.72,
-				Source:     docID,
-			})
-		}
-	}
-	sort.Slice(out, func(i, j int) bool {
-		if out[i].Type == out[j].Type {
-			return out[i].Value < out[j].Value
-		}
-		return out[i].Type < out[j].Type
-	})
-	return out
-}
-
-func extractTimeline(docID, text string) []evidence.TimelineEvent {
-	datePattern := regexp.MustCompile(`\b(20\d{2}|19\d{2})-(0[1-9]|1[0-2])-([0-2]\d|3[01])\b`)
-	matches := datePattern.FindAllString(text, -1)
-	seen := map[string]bool{}
-	var events []evidence.TimelineEvent
-	for _, match := range matches {
-		if seen[match] {
-			continue
-		}
-		seen[match] = true
-		when, err := time.Parse("2006-01-02", match)
-		if err != nil {
-			continue
-		}
-		events = append(events, evidence.TimelineEvent{
-			ID:         stableID("event", docID+match),
-			Document:   docID,
-			When:       when,
-			Label:      "Mentioned date " + match,
-			Confidence: 0.7,
-		})
-	}
-	sort.Slice(events, func(i, j int) bool {
-		return events[i].When.Before(events[j].When)
-	})
-	return events
-}
-
-func summarize(filename, text string, entities []evidence.Entity) string {
-	if text == "" {
-		return filename + " contains no extracted text yet."
-	}
-	clean := strings.Join(strings.Fields(text), " ")
-	if len(clean) > 220 {
-		clean = clean[:220] + "..."
-	}
-	return fmt.Sprintf("%s: %s (%d entities)", filename, clean, len(entities))
-}
-
-func stableID(prefix, value string) string {
-	sum := sha256.Sum256([]byte(strings.ToLower(value)))
-	return prefix + "_" + hex.EncodeToString(sum[:])[:16]
+	return result.text
 }

@@ -53,6 +53,7 @@ func NewRouter(deps Dependencies) http.Handler {
 			r.Get("/search", api.search)
 			r.Get("/graph", api.graph)
 			r.Get("/timeline", api.timeline)
+			r.Get("/debug", api.debugCase)
 			r.Post("/exports", api.createExport)
 			r.Get("/exports/{export_id}", api.getExport)
 		})

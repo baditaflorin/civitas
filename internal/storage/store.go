@@ -111,7 +111,7 @@ func (s *Store) Search(caseID, query string) ([]evidence.SearchResult, error) {
 	}
 	var results []evidence.SearchResult
 	for _, doc := range docs {
-		haystack := stringsLowerTrim(doc.Filename + " " + doc.Text + " " + entityText(doc.Entities))
+		haystack := stringsLowerTrim(doc.Filename + " " + doc.Text + " " + doc.Preview + " " + entityText(doc.Entities) + " " + fieldText(doc.Fields))
 		if !contains(haystack, query) {
 			continue
 		}
@@ -159,21 +159,24 @@ func (s *Store) Timeline(caseID string) ([]evidence.TimelineEvent, error) {
 	return events, nil
 }
 
-func (s *Store) SaveExport(export evidence.Export) error {
+func (s *Store) SaveExport(export evidence.Export) (evidence.Export, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if _, err := s.readCase(export.CaseID); err != nil {
-		return err
+		return evidence.Export{}, err
 	}
 	if err := os.MkdirAll(s.exportDir(export.CaseID), 0o750); err != nil {
-		return fmt.Errorf("create export dir: %w", err)
+		return evidence.Export{}, fmt.Errorf("create export dir: %w", err)
 	}
 	path := filepath.Join(s.exportDir(export.CaseID), export.ID+".md")
 	if err := os.WriteFile(path, []byte(export.Body), 0o600); err != nil {
-		return fmt.Errorf("write export: %w", err)
+		return evidence.Export{}, fmt.Errorf("write export: %w", err)
 	}
 	export.Path = path
-	return writeJSON(path+".json", export)
+	if err := writeJSON(path+".json", export); err != nil {
+		return evidence.Export{}, err
+	}
+	return export, nil
 }
 
 func (s *Store) ReadExport(caseID, exportID string) (evidence.Export, error) {
