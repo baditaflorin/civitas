@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/baditaflorin/civitas/internal/evidence"
+	"github.com/baditaflorin/civitas/internal/exporter"
 )
 
 func TestStoreCaseDocumentSearchGraphTimelineAndExport(t *testing.T) {
@@ -93,5 +94,37 @@ func TestStoreCaseDocumentSearchGraphTimelineAndExport(t *testing.T) {
 	}
 	if !strings.Contains(exported.Body, "Export") {
 		t.Fatalf("unexpected export body: %q", exported.Body)
+	}
+
+	content, err := store.DocumentContent(item.ID, doc.ID)
+	if err != nil {
+		t.Fatalf("document content: %v", err)
+	}
+	refreshedCase, err := store.GetCase(item.ID)
+	if err != nil {
+		t.Fatalf("get refreshed case: %v", err)
+	}
+	state := exporter.CaseState(refreshedCase, []evidence.Document{doc}, map[string][]byte{doc.ID: content}, "0.3.0", time.Now().UTC())
+	restoredStore, err := New(t.TempDir())
+	if err != nil {
+		t.Fatalf("new restored store: %v", err)
+	}
+	imported, err := restoredStore.ImportCaseState(state)
+	if err != nil {
+		t.Fatalf("import case state: %v", err)
+	}
+	importedDocs, err := restoredStore.Documents(imported.ID)
+	if err != nil {
+		t.Fatalf("imported documents: %v", err)
+	}
+	if len(importedDocs) != 1 || importedDocs[0].ID != doc.ID {
+		t.Fatalf("unexpected imported docs: %#v", importedDocs)
+	}
+	importedContent, err := restoredStore.DocumentContent(imported.ID, doc.ID)
+	if err != nil {
+		t.Fatalf("imported content: %v", err)
+	}
+	if string(importedContent) != doc.Text {
+		t.Fatalf("unexpected imported content: %q", importedContent)
 	}
 }

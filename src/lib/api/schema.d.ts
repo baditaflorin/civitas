@@ -4,699 +4,792 @@
  */
 
 export interface paths {
-  "/healthz": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/healthz": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getHealth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getHealth"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/readyz": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/readyz": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getReady"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getReady"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/version": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getVersion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getVersion"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/processors": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/processors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listProcessors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["listProcessors"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/cases": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/v1/cases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listCases"];
+        put?: never;
+        post: operations["createCase"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["listCases"];
-    put?: never;
-    post: operations["createCase"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/cases/{case_id}/documents": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-      };
-      cookie?: never;
+    "/api/v1/case-states/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["importCaseState"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["listDocuments"];
-    put?: never;
-    post: operations["uploadDocument"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/cases/{case_id}/search": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-      };
-      cookie?: never;
+    "/api/v1/cases/{case_id}/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
+        };
+        get: operations["listDocuments"];
+        put?: never;
+        post: operations["uploadDocument"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["searchCase"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/cases/{case_id}/graph": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-      };
-      cookie?: never;
+    "/api/v1/cases/{case_id}/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
+        };
+        get: operations["searchCase"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getGraph"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/cases/{case_id}/timeline": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-      };
-      cookie?: never;
+    "/api/v1/cases/{case_id}/graph": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
+        };
+        get: operations["getGraph"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getTimeline"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/cases/{case_id}/debug": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-      };
-      cookie?: never;
+    "/api/v1/cases/{case_id}/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
+        };
+        get: operations["getTimeline"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["debugCase"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/cases/{case_id}/exports": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-      };
-      cookie?: never;
+    "/api/v1/cases/{case_id}/debug": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
+        };
+        get: operations["debugCase"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations["createExport"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/v1/cases/{case_id}/exports/{export_id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-        export_id: string;
-      };
-      cookie?: never;
+    "/api/v1/cases/{case_id}/state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
+        };
+        get: operations["getCaseState"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["getExport"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
+    "/api/v1/cases/{case_id}/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createExport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cases/{case_id}/exports/{export_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+                export_id: string;
+            };
+            cookie?: never;
+        };
+        get: operations["getExport"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    Status: {
-      status: string;
+    schemas: {
+        Status: {
+            status: string;
+        };
+        VersionInfo: {
+            version: string;
+            commit: string;
+            mode: string;
+        };
+        Case: {
+            id: string;
+            title: string;
+            description: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+            document_ids: string[];
+        };
+        Document: {
+            id: string;
+            case_id: string;
+            filename: string;
+            content_type: string;
+            /** Format: int64 */
+            size: number;
+            sha256: string;
+            status: string;
+            shape: string;
+            state: string;
+            confidence: number;
+            text?: string;
+            preview?: string;
+            summary?: string;
+            fields: components["schemas"]["FieldInference"][];
+            anomalies: components["schemas"]["Anomaly"][];
+            entities: components["schemas"]["Entity"][];
+            timeline: components["schemas"]["TimelineEvent"][];
+            processors: components["schemas"]["ProcessorStatus"][];
+            provenance: components["schemas"]["Provenance"];
+            parse: components["schemas"]["ParseMetrics"];
+            /** Format: date-time */
+            created_at: string;
+        };
+        FieldInference: {
+            id: string;
+            name: string;
+            type: string;
+            value: string;
+            normalized?: string;
+            confidence: number;
+            reason: string;
+        };
+        Anomaly: {
+            id: string;
+            code: string;
+            severity: string;
+            message: string;
+            why: string;
+            next_step: string;
+            confidence: number;
+        };
+        Provenance: {
+            schema_version: string;
+            app_version: string;
+            source_id: string;
+            source_name: string;
+            source_sha256: string;
+            parameters: string[];
+        };
+        ParseMetrics: {
+            /** Format: int64 */
+            duration_ms: number;
+            size_bucket: string;
+            row_count?: number;
+            field_count?: number;
+        };
+        Entity: {
+            id: string;
+            type: string;
+            value: string;
+            confidence: number;
+            source: string;
+        };
+        TimelineEvent: {
+            id: string;
+            document_id: string;
+            /** Format: date-time */
+            when: string;
+            label: string;
+            confidence: number;
+        };
+        ProcessorStatus: {
+            name: string;
+            kind: string;
+            available: boolean;
+            status: string;
+            message?: string;
+            /** Format: date-time */
+            started_at?: string;
+            /** Format: date-time */
+            ended_at?: string;
+        };
+        ProcessorTool: {
+            name: string;
+            kind: string;
+            command: string;
+            available: boolean;
+            description: string;
+        };
+        SearchResult: {
+            document_id: string;
+            filename: string;
+            snippet: string;
+            score: number;
+        };
+        Graph: {
+            nodes: components["schemas"]["GraphNode"][];
+            edges: components["schemas"]["GraphEdge"][];
+        };
+        GraphNode: {
+            id: string;
+            type: string;
+            label: string;
+        };
+        GraphEdge: {
+            id: string;
+            source_id: string;
+            target_id: string;
+            type: string;
+            weight: number;
+        };
+        Export: {
+            id: string;
+            case_id: string;
+            format: string;
+            path: string;
+            body?: string;
+            /** Format: date-time */
+            created_at: string;
+        };
+        CaseState: {
+            schema_version: string;
+            app_version: string;
+            /** Format: date-time */
+            exported_at: string;
+            case: components["schemas"]["Case"];
+            documents: components["schemas"]["StateDocument"][];
+        };
+        StateDocument: {
+            document: components["schemas"]["Document"];
+            content_base64: string;
+            content_sha256: string;
+        };
     };
-    VersionInfo: {
-      version: string;
-      commit: string;
-      mode: string;
+    responses: never;
+    parameters: {
+        CaseID: string;
     };
-    Case: {
-      id: string;
-      title: string;
-      description: string;
-      /** Format: date-time */
-      created_at: string;
-      /** Format: date-time */
-      updated_at: string;
-      document_ids: string[];
-    };
-    Document: {
-      id: string;
-      case_id: string;
-      filename: string;
-      content_type: string;
-      /** Format: int64 */
-      size: number;
-      sha256: string;
-      status: string;
-      shape: string;
-      state: string;
-      confidence: number;
-      text?: string;
-      preview?: string;
-      summary?: string;
-      fields: components["schemas"]["FieldInference"][];
-      anomalies: components["schemas"]["Anomaly"][];
-      entities: components["schemas"]["Entity"][];
-      timeline: components["schemas"]["TimelineEvent"][];
-      processors: components["schemas"]["ProcessorStatus"][];
-      provenance: components["schemas"]["Provenance"];
-      parse: components["schemas"]["ParseMetrics"];
-      /** Format: date-time */
-      created_at: string;
-    };
-    FieldInference: {
-      id: string;
-      name: string;
-      type: string;
-      value: string;
-      normalized?: string;
-      confidence: number;
-      reason: string;
-    };
-    Anomaly: {
-      id: string;
-      code: string;
-      severity: string;
-      message: string;
-      why: string;
-      next_step: string;
-      confidence: number;
-    };
-    Provenance: {
-      schema_version: string;
-      app_version: string;
-      source_id: string;
-      source_name: string;
-      source_sha256: string;
-      parameters: string[];
-    };
-    ParseMetrics: {
-      /** Format: int64 */
-      duration_ms: number;
-      size_bucket: string;
-      row_count?: number;
-      field_count?: number;
-    };
-    Entity: {
-      id: string;
-      type: string;
-      value: string;
-      confidence: number;
-      source: string;
-    };
-    TimelineEvent: {
-      id: string;
-      document_id: string;
-      /** Format: date-time */
-      when: string;
-      label: string;
-      confidence: number;
-    };
-    ProcessorStatus: {
-      name: string;
-      kind: string;
-      available: boolean;
-      status: string;
-      message?: string;
-      /** Format: date-time */
-      started_at?: string;
-      /** Format: date-time */
-      ended_at?: string;
-    };
-    ProcessorTool: {
-      name: string;
-      kind: string;
-      command: string;
-      available: boolean;
-      description: string;
-    };
-    SearchResult: {
-      document_id: string;
-      filename: string;
-      snippet: string;
-      score: number;
-    };
-    Graph: {
-      nodes: components["schemas"]["GraphNode"][];
-      edges: components["schemas"]["GraphEdge"][];
-    };
-    GraphNode: {
-      id: string;
-      type: string;
-      label: string;
-    };
-    GraphEdge: {
-      id: string;
-      source_id: string;
-      target_id: string;
-      type: string;
-      weight: number;
-    };
-    Export: {
-      id: string;
-      case_id: string;
-      format: string;
-      path: string;
-      body?: string;
-      /** Format: date-time */
-      created_at: string;
-    };
-  };
-  responses: never;
-  parameters: {
-    CaseID: string;
-  };
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  getHealth: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Healthy. */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    getHealth: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          "application/json": components["schemas"]["Status"];
+        requestBody?: never;
+        responses: {
+            /** @description Healthy. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Status"];
+                };
+            };
         };
-      };
     };
-  };
-  getReady: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Ready. */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    getReady: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          "application/json": components["schemas"]["Status"];
+        requestBody?: never;
+        responses: {
+            /** @description Ready. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Status"];
+                };
+            };
         };
-      };
     };
-  };
-  getVersion: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Version details. */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    getVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          "application/json": components["schemas"]["VersionInfo"];
+        requestBody?: never;
+        responses: {
+            /** @description Version details. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionInfo"];
+                };
+            };
         };
-      };
     };
-  };
-  listProcessors: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Processor registry. */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    listProcessors: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          "application/json": {
-            processors: components["schemas"]["ProcessorTool"][];
-          };
+        requestBody?: never;
+        responses: {
+            /** @description Processor registry. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        processors: components["schemas"]["ProcessorTool"][];
+                    };
+                };
+            };
         };
-      };
     };
-  };
-  listCases: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Case list. */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    listCases: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          "application/json": {
-            cases: components["schemas"]["Case"][];
-          };
+        requestBody?: never;
+        responses: {
+            /** @description Case list. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        cases: components["schemas"]["Case"][];
+                    };
+                };
+            };
         };
-      };
     };
-  };
-  createCase: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          title: string;
-          description?: string;
+    createCase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-    responses: {
-      /** @description Created case. */
-      201: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": {
+                    title: string;
+                    description?: string;
+                };
+            };
         };
-        content: {
-          "application/json": components["schemas"]["Case"];
+        responses: {
+            /** @description Created case. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Case"];
+                };
+            };
         };
-      };
     };
-  };
-  listDocuments: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Documents in a case. */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    importCaseState: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content: {
-          "application/json": {
-            documents: components["schemas"]["Document"][];
-          };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CaseState"];
+            };
         };
-      };
-    };
-  };
-  uploadDocument: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "multipart/form-data": {
-          /** Format: binary */
-          file: string;
+        responses: {
+            /** @description Imported case. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Case"];
+                };
+            };
         };
-      };
     };
-    responses: {
-      /** @description Uploaded and processed document. */
-      201: {
-        headers: {
-          [name: string]: unknown;
+    listDocuments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
         };
-        content: {
-          "application/json": components["schemas"]["Document"];
+        requestBody?: never;
+        responses: {
+            /** @description Documents in a case. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        documents: components["schemas"]["Document"][];
+                    };
+                };
+            };
         };
-      };
     };
-  };
-  searchCase: {
-    parameters: {
-      query?: {
-        q?: string;
-      };
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Search results. */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    uploadDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
         };
-        content: {
-          "application/json": {
-            results: components["schemas"]["SearchResult"][];
-          };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                };
+            };
         };
-      };
-    };
-  };
-  getGraph: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Evidence graph. */
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            /** @description Uploaded and processed document. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Document"];
+                };
+            };
         };
-        content: {
-          "application/json": components["schemas"]["Graph"];
-        };
-      };
     };
-  };
-  getTimeline: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Timeline events. */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    searchCase: {
+        parameters: {
+            query?: {
+                q?: string;
+            };
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
         };
-        content: {
-          "application/json": {
-            events: components["schemas"]["TimelineEvent"][];
-          };
+        requestBody?: never;
+        responses: {
+            /** @description Search results. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        results: components["schemas"]["SearchResult"][];
+                    };
+                };
+            };
         };
-      };
     };
-  };
-  debugCase: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Debug document inference state. */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    getGraph: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
         };
-        content: {
-          "application/json": {
-            documents: components["schemas"]["Document"][];
-            count: number;
-          };
+        requestBody?: never;
+        responses: {
+            /** @description Evidence graph. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Graph"];
+                };
+            };
         };
-      };
     };
-  };
-  createExport: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @default markdown */
-          format?: string;
+    getTimeline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
         };
-      };
-    };
-    responses: {
-      /** @description Generated export. */
-      201: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            /** @description Timeline events. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        events: components["schemas"]["TimelineEvent"][];
+                    };
+                };
+            };
         };
-        content: {
-          "application/json": components["schemas"]["Export"];
-        };
-      };
     };
-  };
-  getExport: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        case_id: components["parameters"]["CaseID"];
-        export_id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Generated export body. */
-      200: {
-        headers: {
-          [name: string]: unknown;
+    debugCase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
         };
-        content: {
-          "application/json": components["schemas"]["Export"];
+        requestBody?: never;
+        responses: {
+            /** @description Debug document inference state. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        documents: components["schemas"]["Document"][];
+                        count: number;
+                    };
+                };
+            };
         };
-      };
     };
-  };
+    getCaseState: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Downloadable case state. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseState"];
+                };
+            };
+        };
+    };
+    createExport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @default markdown */
+                    format?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Generated export. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Export"];
+                };
+            };
+        };
+    };
+    getExport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: components["parameters"]["CaseID"];
+                export_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Generated export body. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Export"];
+                };
+            };
+        };
+    };
 }

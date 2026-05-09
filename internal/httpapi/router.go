@@ -47,6 +47,7 @@ func NewRouter(deps Dependencies) http.Handler {
 		r.Get("/processors", api.processors)
 		r.Get("/cases", api.listCases)
 		r.Post("/cases", api.createCase)
+		r.Post("/case-states/import", api.importCaseState)
 		r.Route("/cases/{case_id}", func(r chi.Router) {
 			r.Get("/documents", api.listDocuments)
 			r.Post("/documents", api.uploadDocument)
@@ -54,6 +55,7 @@ func NewRouter(deps Dependencies) http.Handler {
 			r.Get("/graph", api.graph)
 			r.Get("/timeline", api.timeline)
 			r.Get("/debug", api.debugCase)
+			r.Get("/state", api.getCaseState)
 			r.Post("/exports", api.createExport)
 			r.Get("/exports/{export_id}", api.getExport)
 		})

@@ -89,6 +89,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Case"
+  /api/v1/case-states/import:
+    post:
+      operationId: importCaseState
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CaseState"
+      responses:
+        "201":
+          description: Imported case.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Case"
   /api/v1/cases/{case_id}/documents:
     parameters:
       - $ref: "#/components/parameters/CaseID"
@@ -200,6 +216,18 @@ paths:
                       $ref: "#/components/schemas/Document"
                   count:
                     type: integer
+  /api/v1/cases/{case_id}/state:
+    parameters:
+      - $ref: "#/components/parameters/CaseID"
+    get:
+      operationId: getCaseState
+      responses:
+        "200":
+          description: Downloadable case state.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaseState"
   /api/v1/cases/{case_id}/exports:
     parameters:
       - $ref: "#/components/parameters/CaseID"
@@ -563,3 +591,30 @@ components:
         created_at:
           type: string
           format: date-time
+    CaseState:
+      type: object
+      required: [schema_version, app_version, exported_at, case, documents]
+      properties:
+        schema_version:
+          type: string
+        app_version:
+          type: string
+        exported_at:
+          type: string
+          format: date-time
+        case:
+          $ref: "#/components/schemas/Case"
+        documents:
+          type: array
+          items:
+            $ref: "#/components/schemas/StateDocument"
+    StateDocument:
+      type: object
+      required: [document, content_base64, content_sha256]
+      properties:
+        document:
+          $ref: "#/components/schemas/Document"
+        content_base64:
+          type: string
+        content_sha256:
+          type: string

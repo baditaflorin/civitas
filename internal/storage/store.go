@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"os"
@@ -11,6 +12,8 @@ import (
 
 	"github.com/baditaflorin/civitas/internal/evidence"
 )
+
+const caseStateSchemaVersion = "civitas.case_state.v1"
 
 type Store struct {
 	root string
@@ -98,6 +101,25 @@ func (s *Store) Documents(caseID string) ([]evidence.Document, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.documentsUnlocked(caseID)
+}
+
+func (s *Store) DocumentContent(caseID, docID string) ([]byte, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	matches, err := filepath.Glob(filepath.Join(s.uploadDir(caseID), filepath.Base(docID)+"_*"))
+	if err != nil {
+		return nil, fmt.Errorf("find uploaded document: %w", err)
+	}
+	if len(matches) == 0 {
+		return nil, ErrNotFound
+	}
+	sort.Strings(matches)
+	// #nosec G304 -- matches are constrained to the case upload directory.
+	content, err := os.ReadFile(matches[0])
+	if err != nil {
+		return nil, fmt.Errorf("read uploaded document: %w", err)
+	}
+	return content, nil
 }
 
 func (s *Store) Search(caseID, query string) ([]evidence.SearchResult, error) {
@@ -192,6 +214,51 @@ func (s *Store) ReadExport(caseID, exportID string) (evidence.Export, error) {
 		return evidence.Export{}, fmt.Errorf("read export body: %w", err)
 	}
 	item.Body = string(body)
+	return item, nil
+}
+
+func (s *Store) ImportCaseState(state evidence.CaseState) (evidence.Case, error) {
+	if state.SchemaVersion != caseStateSchemaVersion {
+		return evidence.Case{}, fmt.Errorf("unsupported case state schema %q", state.SchemaVersion)
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	item := state.Case
+	if item.ID == "" {
+		item.ID = newID("case")
+	}
+	if _, err := s.readCase(item.ID); err == nil {
+		item.ID = newID("case")
+		item.Title = item.Title + " (imported)"
+	} else if !errors.Is(err, ErrNotFound) {
+		return evidence.Case{}, err
+	}
+	if item.DocumentIDs == nil {
+		item.DocumentIDs = []string{}
+	}
+	if err := os.MkdirAll(s.uploadDir(item.ID), 0o750); err != nil {
+		return evidence.Case{}, fmt.Errorf("create import upload dir: %w", err)
+	}
+	for _, stateDoc := range state.Documents {
+		content, err := base64.StdEncoding.DecodeString(stateDoc.ContentBase64)
+		if err != nil {
+			return evidence.Case{}, fmt.Errorf("decode document %s: %w", stateDoc.Document.ID, err)
+		}
+		doc := stateDoc.Document
+		doc.CaseID = item.ID
+		name := filepath.Base(doc.Filename)
+		if err := os.WriteFile(filepath.Join(s.uploadDir(item.ID), doc.ID+"_"+name), content, 0o600); err != nil {
+			return evidence.Case{}, fmt.Errorf("write imported upload: %w", err)
+		}
+		if err := writeJSON(s.documentPath(item.ID, doc.ID), doc); err != nil {
+			return evidence.Case{}, err
+		}
+		item.DocumentIDs = appendIfMissing(item.DocumentIDs, doc.ID)
+	}
+	if err := writeJSON(s.casePath(item.ID), item); err != nil {
+		return evidence.Case{}, err
+	}
 	return item, nil
 }
 

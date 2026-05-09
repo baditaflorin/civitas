@@ -142,6 +142,20 @@ type Export struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type CaseState struct {
+	SchemaVersion string          `json:"schema_version"`
+	AppVersion    string          `json:"app_version"`
+	ExportedAt    time.Time       `json:"exported_at"`
+	Case          Case            `json:"case"`
+	Documents     []StateDocument `json:"documents"`
+}
+
+type StateDocument struct {
+	Document      Document `json:"document"`
+	ContentBase64 string   `json:"content_base64"`
+	ContentSHA256 string   `json:"content_sha256"`
+}
+
 type VersionInfo struct {
 	Version string `json:"version"`
 	Commit  string `json:"commit"`
