@@ -92,6 +92,7 @@ func (a *API) listDocuments(w http.ResponseWriter, r *http.Request) {
 
 func (a *API) uploadDocument(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 100<<20)
+	// #nosec G120 -- MaxBytesReader caps request bytes before multipart parsing.
 	if err := r.ParseMultipartForm(100 << 20); err != nil {
 		writeJSON(w, http.StatusBadRequest, errorResponse{Code: "bad_request", Message: "multipart form required"})
 		return
