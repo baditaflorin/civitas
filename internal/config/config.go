@@ -22,7 +22,7 @@ type rawConfig struct {
 	Addr           string `envconfig:"ADDR" default:":8080"`
 	StorageDir     string `envconfig:"STORAGE_DIR" default:"./storage"`
 	AllowedOrigins string `envconfig:"ALLOWED_ORIGINS" default:"http://localhost:5173,https://baditaflorin.github.io"`
-	Version        string `envconfig:"VERSION" default:"0.2.0"`
+	Version        string `envconfig:"VERSION" default:"0.3.0"`
 	CommitSHA      string `envconfig:"COMMIT_SHA" default:"dev"`
 }
 
@@ -31,7 +31,7 @@ func Load(buildVersion, buildCommit string) (Config, error) {
 	if err := envconfig.Process("civitas", &raw); err != nil {
 		return Config{}, fmt.Errorf("process env: %w", err)
 	}
-	if raw.Version == "" || raw.Version == "0.2.0" {
+	if raw.Version == "" || raw.Version == "0.3.0" {
 		raw.Version = buildVersion
 	}
 	if raw.CommitSHA == "" || raw.CommitSHA == "dev" {

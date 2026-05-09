@@ -36,11 +36,11 @@ Ranked by real-user impact and constrained to completeness, not polish or engine
 
 ## Batches
 
-1. ADRs 0060-0071.
-2. Backend state export/import and exporter extraction.
-3. Frontend input/output/session/settings completion.
-4. Tests and documentation alignment.
-5. Stranger test, postmortem, version bump, Pages build, tag, push.
+1. ADRs 0060-0071. Done.
+2. Backend state export/import and exporter extraction. Done.
+3. Frontend input/output/session/settings completion. Done.
+4. Tests and documentation alignment. Done.
+5. Stranger test, postmortem, version bump, Pages build, tag, push. Done after final verification/tag.
 
 ## Explicit Non-Goals
 

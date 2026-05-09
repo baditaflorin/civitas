@@ -4,37 +4,43 @@ Date: 2026-05-10
 
 ## Top 5 Usability Gaps
 
-1. Users can upload only one file at a time; document dumps require repetitive manual work.
-2. Users cannot paste copied text/HTML evidence directly.
-3. Safe export is preview-only in the UI; no copy, download, or print action exists.
-4. There is no state backup/import, so users cannot move or restore an investigation themselves.
-5. Reload loses selected case and search context.
+| Gap | Resolution |
+| --- | --- |
+| Users could upload only one file at a time. | Multi-file picker and drag/drop share one upload path with progress/result feedback. |
+| Users could not paste copied text/HTML evidence. | Paste box uploads copied text/HTML as evidence files. |
+| Safe export was preview-only. | Export can be copied, downloaded, and printed. |
+| No state backup/import existed. | Versioned case-state JSON can be downloaded and imported. |
+| Reload lost selected case/search context. | Endpoint, selected case id, and search term persist locally with a reset control. |
 
-## Top 5 Half-Baked Features
+## Half-Baked Feature Outcomes
 
-| Feature | Decision | Rationale |
+| Feature | Decision | Outcome |
 | --- | --- | --- |
-| Safe export preview | Finish | Core promise says publishable evidence; preview-only is not usable. |
-| Single-file upload | Finish | Phase 2 engine is useful only if users can load their actual dump. |
-| Demo graph | Finish as honest empty state | Keep visual affordance, but stop implying loaded sample evidence. |
-| Backend endpoint setting | Finish | It persists but has no reset/clear-state story. |
-| README OCR/transcription/indexing claims | Edit | They overstate current processor-needed behavior. |
+| Safe export preview | Finish | Copy/download/print added. |
+| Single-file upload | Finish | Batch, drag/drop, and paste paths added around the same endpoint. |
+| Demo graph | Finish as honest empty state | Placeholder copy no longer implies loaded sample evidence. |
+| Backend endpoint setting | Finish | Settings panel now includes connect, status, and start-fresh reset. |
+| README OCR/transcription/indexing claims | Edit | Claims now match processor-needed/native-tool limitations. |
 
-## Top 5 Codebase Pain Points
+## Codebase Pain Points
 
-1. `CivitasWorkspace.tsx` is the primary god module.
-2. API response casts are repeated and unsafe in the frontend.
-3. Export formatting is embedded in HTTP handlers.
-4. Session persistence is a one-off endpoint helper.
-5. E2E tests do not exercise the actual user workflow.
+| Pain point | Resolution |
+| --- | --- |
+| `CivitasWorkspace.tsx` owned many workflows. | Accepted as coordinator debt for Phase 3; core repeated logic was extracted. |
+| API response casts repeated in frontend. | `requireData` and JSON narrowing removed repeated unsafe casts. |
+| Export formatting embedded in handlers. | Moved to `internal/exporter`. |
+| Session persistence was one-off. | Moved to `src/lib/session.ts`. |
+| E2E only checked page load. | Smoke now covers the real fresh-user workflow. |
 
-## Top 5 Documentation/Reality Mismatches
+## Documentation/Reality Mismatches
 
-1. README says OCR/transcription workflows; reality is explicit `needs_processor`.
-2. README says indexing; reality is simple stored-document search/graph.
-3. README says document dumps; UI supports one file at a time.
-4. Privacy docs mention only endpoint storage; Phase 3 will persist more UI session state.
-5. API docs do not mention state backup/import because it does not exist yet.
+| Mismatch | Resolution |
+| --- | --- |
+| README implied native OCR/transcription workflows were complete. | Rewritten as processor-needed/future-adapter limitation. |
+| README implied heavier indexing infrastructure than exists. | Rewritten around current search/graph/timeline behavior. |
+| "Document dumps" was not true with one-file upload. | Batch upload and paste added. |
+| Privacy docs mentioned only endpoint storage. | Updated to include selected case id and search term. |
+| API docs lacked state backup/import. | State export/import curl examples added. |
 
 ## Fully Usable Means
 
@@ -46,18 +52,18 @@ Date: 2026-05-10
 
 ## Phase 3 Success Metrics
 
-- Multi-file upload succeeds with partial-success feedback for at least three real fixtures.
-- Paste-to-evidence creates a document without manual file creation.
-- Safe export supports copy, markdown download, and print from the UI.
-- State export/import round-trip restores case metadata and documents with deterministic IDs.
-- E2E test covers create case, upload/paste, export, and visible result.
-- Type-safety audit has no unsafe frontend casts outside API boundary helpers.
-- README claims match implemented/tested behavior.
+- Multi-file upload succeeds with partial-success feedback: shipped through `uploadFiles`.
+- Paste-to-evidence creates a document without manual file creation: shipped and smoke-tested.
+- Safe export supports copy, markdown download, and print: shipped.
+- State export/import round-trip restores case metadata and documents: shipped and smoke-tested.
+- E2E covers create case, paste/upload, export, state export, and state import: shipped.
+- Type-safety audit has no unsafe frontend casts outside API boundary helpers: shipped.
+- README claims match implemented/tested behavior: shipped.
 
 ## Out of Scope
 
-- No new engine inference behavior.
 - No direct URL scraping/fetching.
-- No folder upload; ZIP remains the supported dump container.
-- No share link that encodes sensitive evidence in the URL.
-- No UI polish beyond controls needed for completeness.
+- No folder upload beyond ZIP-as-archive input.
+- No hash/share URLs containing evidence.
+- No new inference behavior beyond Phase 2.
+- No visual polish work beyond making controls truthful and reachable.

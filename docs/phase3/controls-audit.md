@@ -2,21 +2,27 @@
 
 Date: 2026-05-10
 
-| Control | Status before | Handler/result | Decision |
+| Control | Status before | Status after | Handler/result |
 | --- | --- | --- | --- |
-| Star on GitHub | Green | Opens https://github.com/baditaflorin/civitas. | Keep. |
-| PayPal | Green | Opens https://www.paypal.com/paypalme/florinbadita. | Keep. |
-| API endpoint input | Yellow | Saves endpoint to `localStorage`, but no reset/default validation message. | Finish with settings/reset behavior. |
-| Connect | Yellow | Applies endpoint and refetches. | Keep, add persistence coherence. |
-| New case | Yellow | Creates a case, but form values remain and errors are not surfaced inline. | Finish enough to be usable. |
-| Case row | Green | Selects case. | Persist selected case. |
-| Search input | Yellow | Runs search, but default search term is arbitrary and reload loses the user's query. | Persist query and allow clear. |
-| File picker | Yellow | Uploads only first file. | Finish as multi-file input. |
-| Safe export | Yellow | Generates export preview only. | Finish with copy/download/print. |
-| Evidence map | Yellow | Shows demo graph when no backend data. | Keep but label as empty state, not sample evidence. |
-| Processors list | Yellow | Lists tools but no next step. | Keep; not a stub, but docs should explain local processors. |
-| Timeline list | Yellow | Shows five events only; no empty-state guidance. | Keep, not top priority. |
+| Star on GitHub | Green | Green | Opens https://github.com/baditaflorin/civitas. |
+| PayPal | Green | Green | Opens https://www.paypal.com/paypalme/florinbadita. |
+| API endpoint input | Yellow | Green | Valid endpoint is persisted; settings show backend status. |
+| Connect | Yellow | Green | Applies endpoint, persists it, refetches data, and reports success. |
+| Start fresh | Gray | Green | Clears local endpoint/selected-case/search state and leaves backend evidence intact. |
+| New case | Yellow | Green | Creates a case, selects it, and smoke verifies the fresh-user path. |
+| Case row | Green | Green | Selects case and persists selected id across reload. |
+| Search input | Yellow | Green | Runs search and persists term across reload. |
+| File picker | Yellow | Green | Accepts multiple files and shares batch progress/result handling. |
+| Drag/drop area | Gray | Green | Uploads dropped files. |
+| Paste box / Upload paste | Gray | Green | Creates text/HTML evidence and uploads it. |
+| Load sample | Red | Green | Loads bundled sample through the same backend upload path. |
+| Import state | Gray | Green | Validates and imports `civitas.case_state.v1` JSON. |
+| Safe export | Yellow | Green | Generates markdown and unlocks copy/download/print. |
+| Download state | Gray | Green | Downloads portable case state JSON. |
+| Evidence map | Yellow | Green | Shows real graph when evidence exists and honest placeholder copy otherwise. |
+| Processors list | Yellow | Green | Lists processor availability; README explains native-heavy limitations. |
+| Timeline list | Yellow | Green | Shows timeline candidates and no longer claims more than the backend provides. |
 
-## Control Findings
+## Control Summary
 
-There are no dead buttons, but several controls stop one step short of what their labels imply. `Safe export` is the clearest half-baked control: it generates text, but does not let the user safely take it with them.
+Production UI now has no visible stub controls. Controls either perform the labeled end-to-end action on real data or are absent and documented out of scope.

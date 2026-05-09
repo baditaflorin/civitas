@@ -25,7 +25,7 @@ func TestRouterVersionEndpoint(t *testing.T) {
 			Addr:           ":0",
 			StorageDir:     t.TempDir(),
 			AllowedOrigins: []string{"http://example.test"},
-			Version:        "0.2.0",
+			Version:        "0.3.0",
 			CommitSHA:      "abc123",
 		},
 		Logger:   slog.Default(),
@@ -41,7 +41,7 @@ func TestRouterVersionEndpoint(t *testing.T) {
 	if resp.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", resp.Code, resp.Body.String())
 	}
-	if body := resp.Body.String(); body == "" || !containsAll(body, "0.2.0", "abc123") {
+	if body := resp.Body.String(); body == "" || !containsAll(body, "0.3.0", "abc123") {
 		t.Fatalf("unexpected body: %s", body)
 	}
 }

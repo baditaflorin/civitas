@@ -72,7 +72,7 @@ func (p *Pipeline) Analyze(caseID, docID, filename string, content []byte) evide
 		Processors:  processors,
 		Provenance: evidence.Provenance{
 			SchemaVersion: schemaVersion,
-			AppVersion:    "0.2.0",
+			AppVersion:    "0.3.0",
 			SourceID:      docID,
 			SourceName:    filepath.Base(filename),
 			SourceSHA256:  hashText,

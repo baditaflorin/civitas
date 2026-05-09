@@ -4,7 +4,7 @@ FROM --platform=$BUILDPLATFORM golang:1.26.3-alpine AS builder
 
 ARG TARGETOS
 ARG TARGETARCH
-ARG VERSION=0.1.0
+ARG VERSION=0.3.0
 ARG COMMIT_SHA=dev
 
 WORKDIR /src
@@ -21,7 +21,7 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} \
 
 FROM gcr.io/distroless/static-debian12:nonroot
 
-ARG VERSION=0.1.0
+ARG VERSION=0.3.0
 ARG COMMIT_SHA=dev
 ARG CREATED=unknown
 

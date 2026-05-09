@@ -45,3 +45,20 @@ curl -s http://localhost:8080/api/v1/cases/case_id/exports \
   -H 'content-type: application/json' \
   -d '{"format":"markdown"}'
 ```
+
+Download a portable case state file:
+
+```sh
+curl -s http://localhost:8080/api/v1/cases/case_id/state \
+  > civitas-case-state.json
+```
+
+Import a portable case state file:
+
+```sh
+curl -s http://localhost:8080/api/v1/case-states/import \
+  -H 'content-type: application/json' \
+  --data-binary @civitas-case-state.json
+```
+
+The GitHub Pages app also shows a current-case state export command in the export panel after a case is selected.

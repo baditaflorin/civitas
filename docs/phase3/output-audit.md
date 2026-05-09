@@ -2,29 +2,27 @@
 
 Date: 2026-05-10
 
-Status key: Green = works fully on real user data. Yellow = works partially. Red = claimed or visible but broken/confusing. Gray = not built and not claimed.
+Status key: Green = works fully on real user data. Yellow = works partially. Red = claimed or visible but broken/confusing. Gray = not built and not claimed. Out = explicitly out of scope by ADR.
 
-| Output pathway | Status before | Evidence | User impact |
-| --- | --- | --- | --- |
-| Safe markdown export | Yellow | `Safe export` calls `/exports` and renders the body in a `<pre>`. | Export exists but cannot be downloaded or copied from the UI. |
-| Download safe export | Gray | Backend writes export file locally; frontend does not download it. | A user cannot take the generated report out of the browser without manual selection. |
-| Copy export to clipboard | Gray | No copy handler. | Common reporting workflow is missing. |
-| Downloadable state file | Gray | No case state JSON endpoint or frontend download. | Users cannot back up or move an investigation. |
-| Imported state round-trip | Gray | No import endpoint/UI. | Exported state would not be recoverable. |
-| CSV export | Gray | README does not claim CSV export. | Out of scope for v0.3.0; avoid claiming it. |
-| JSON export | Gray | No user-facing JSON state export, though API returns JSON. | State JSON is the useful Phase 3 target. |
-| Code/API export | Yellow | `docs/api.md` has curl examples; UI does not expose a command for the current case. | Automators must read docs and manually fill IDs. |
-| Copy search/result snippets | Gray | No copy action. | Lower priority than export copy. |
-| Share link | Gray | No shareable state URL. | Out of scope for backend evidence; hash state may leak sensitive data if done casually. |
-| Print-friendly view | Yellow | Browser can print the app, but no export print action or print CSS. | Safe export should have a print button. |
-| Screenshot | Gray | Not claimed. | Out of scope. |
-| Embed code | Gray | Not claimed. | Out of scope. |
-| Public Pages links | Green | Header links to GitHub repo and PayPal; Pages bundle contains both URLs. | Users can star/support the project from the live page. |
+| Output pathway | Status before | Status after | Evidence | Outcome |
+| --- | --- | --- | --- | --- |
+| Safe markdown export | Yellow | Green | `/exports` still generates markdown; UI now exposes it with downstream actions. | Export is useful, not preview-only. |
+| Download safe export | Gray | Green | `Download markdown` creates a `.md` browser download. | Users can take the publishable artifact out. |
+| Copy export to clipboard | Gray | Green | `Copy export` writes export body to `navigator.clipboard` and reports success/failure. | Common paste-into-editor flow works. |
+| Downloadable state file | Gray | Green | `/api/v1/cases/{case_id}/state` returns versioned `civitas.case_state.v1` JSON and the UI downloads it. | Users can back up and migrate investigations. |
+| Imported state round-trip | Gray | Green | `/api/v1/case-states/import` restores case metadata, document metadata, and source bytes; smoke covers import. | State export is recoverable, not a dead artifact. |
+| CSV export | Gray | Out | ADR 0062 keeps CSV out of scope because it was not claimed. | Docs do not promise it. |
+| JSON export | Gray | Green | Case state JSON is documented and downloadable. | JSON output exists for full investigation state. |
+| Code/API export | Yellow | Green | Export panel shows a current-case curl command for state download; `docs/api.md` has import/export commands. | Automators no longer have to invent IDs and endpoints. |
+| Copy search/result snippets | Gray | Out | Not claimed; ADR 0062 prioritizes export copy. | No placeholder control exists. |
+| Share link | Gray | Out | ADR 0062 rejects share links containing evidence in URLs. | Sensitive state is not encoded into links. |
+| Print-friendly view | Yellow | Green | `Print export` opens a markdown-only print view. | Users can print the safe export instead of the whole workspace. |
+| Screenshot | Gray | Out | Not claimed. | No misleading control exists. |
+| Embed code | Gray | Out | Not claimed. | No misleading control exists. |
+| Public Pages links | Green | Green | Header links to GitHub repo and PayPal; e2e asserts both URLs. | Users can star/support from the live page. |
 
-## Output Findings
+## Output Summary
 
-1. The core markdown export is not actually portable from the UI.
-2. No state backup/import path exists, so persistence depends on one backend instance.
-3. API automation is documented but not contextualized inside the app.
-4. Share links and screenshots are not claimed and should stay out of scope for Phase 3.
-5. Print should target the generated safe export, not the whole operational workspace.
+Before: 1 green, 3 yellow, 10 gray.
+
+After: 8 green, 6 explicitly out of scope by ADR, 0 red, 0 yellow among claimed controls.

@@ -2,22 +2,19 @@
 
 Date: 2026-05-10
 
-| Claim source | Claim | Status before | Reality check |
-| --- | --- | --- | --- |
-| README | "Turning leaked document dumps into searchable, analyzable, publishable evidence." | Shipped partially | Search/graph/timeline/export exist, but input/output paths are incomplete for dumps. |
-| README architecture | "private ingestion, OCR, transcription, indexing, and redaction workflows" | Shipped partially | Ingestion/redaction metadata exist; OCR/transcription are honest `needs_processor` states, not full workflows. |
-| README diagram | "Search and graph indexes" | Shipped partially | Search/graph are computed from stored docs, not Tantivy/DuckDB-style indexes. |
-| README quickstart | `make install-hooks`, `make dev`, `make build`, `make test`, `make smoke` | Shipped fully | Local targets exist and passed in Phase 2. |
-| docs/api.md | Curl examples for cases, uploads, search, export | Shipped fully | API endpoints exist. |
-| docs/privacy.md | Frontend stores only API endpoint, not evidence | Shipped fully before Phase 3 | Evidence remains backend-side; Phase 3 client session preferences need docs update. |
-| Phase 2 docs | Confidence/provenance/state on uploads | Shipped fully | Fixture suite asserts it. |
-| In-app header | Version and commit visible | Shipped fully | Bundle shows v0.2.0 and GitHub main commit fallback. |
-| In-app demo map | Demo relationship map | Shipped partially | It is a visual placeholder, not a loadable sample. |
+| Claim source | Claim | Status before | Status after | Reality check |
+| --- | --- | --- | --- | --- |
+| README | "Turning leaked document dumps into searchable, analyzable, publishable evidence." | Shipped partially | Shipped with documented limits | Batch upload, paste, search, map, timeline, export, and state backup now work; native processors remain limitations. |
+| README architecture | "private ingestion, OCR, transcription, indexing, and redaction workflows" | Overclaimed | Fixed | README now says OCR/transcription/native processing are processor-needed states or future adapters unless the backend image is extended. |
+| README diagram | "Search and graph indexes" | Overclaimed | Fixed | Diagram now says shape-aware analysis and safe/state exports. |
+| README quickstart | `make install-hooks`, `make dev`, `make build`, `make test`, `make smoke` | Shipped fully | Shipped fully | Targets exist; smoke passed on v0.3.0. |
+| docs/api.md | Curl examples for cases, uploads, search, export | Shipped fully | Shipped fully | API endpoints exist and now include state export/import examples. |
+| docs/privacy.md | Frontend stores only endpoint, not evidence | Drift risk | Fixed | Privacy docs list endpoint, selected case id, and search term; evidence remains backend-side. |
+| Phase 2 docs | Confidence/provenance/state on uploads | Shipped fully | Shipped fully | Fixture suite still passes. |
+| In-app header | Version and commit visible | Shipped fully | Shipped fully | Header shows v0.3.0 and GitHub commit fallback. |
+| In-app demo map | Demo relationship map | Shipped partially | Fixed | Placeholder copy now says example layout until evidence is uploaded. |
+| Phase 3 docs | "No stubs left in production UI" | Not applicable | Shipped | Controls audit and smoke test cover visible production controls. |
 
-## Claim Findings
+## Claim Summary
 
-1. README overstates OCR/transcription as workflows when they are currently processor-needed states.
-2. README implies indexing infrastructure that is not present.
-3. "Document dump" usability is not true until multi-file and state export/import are finished.
-4. Privacy docs must be updated when more UI preferences are persisted.
-5. Public project links are true and tested.
+All README/API/privacy/in-app claims now either match implemented behavior or explicitly name the limitation. Claims without tests or audit evidence were removed.

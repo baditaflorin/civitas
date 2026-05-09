@@ -28,7 +28,7 @@ test("fresh user creates a case, uploads pasted evidence, and exports", async ({
   }, apiBase);
   await page.goto(".");
 
-  await expect(page.getByText(/Backend 0\.2\.0/)).toBeVisible();
+  await expect(page.getByText(/Backend 0\.3\.0/)).toBeVisible();
   await page.getByPlaceholder("Case title").fill("Stranger workflow");
   await page.getByPlaceholder("Case notes").fill("Smoke test case");
   await page.getByRole("button", { name: /new case/i }).click();

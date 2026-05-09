@@ -19,14 +19,14 @@ C4Context
   }
   System_Boundary(server, "Self-hosted Docker server") {
     System(api, "Civitas API", "Go REST API")
-    System(pipeline, "Evidence pipeline", "Native processor adapters")
-    SystemDb(storage, "Local storage", "Evidence and derived artifacts")
+    System(pipeline, "Evidence pipeline", "Shape-aware analysis and processor states")
+    SystemDb(storage, "Local storage", "Evidence, derived artifacts, and exports")
   }
   System_Ext(github, "GitHub", "Repository and Pages hosting")
   System_Ext(ghcr, "GHCR", "Backend container images")
   Rel(investigator, frontend, "Uses", "HTTPS")
   Rel(frontend, api, "Calls configured backend", "HTTPS/JSON")
-  Rel(api, pipeline, "Runs ingestion and export jobs")
+  Rel(api, pipeline, "Runs ingestion, analysis, and export")
   Rel(pipeline, storage, "Reads and writes")
   Rel(github, frontend, "Publishes")
   Rel(ghcr, api, "Provides image")
@@ -42,17 +42,21 @@ flowchart LR
   nginx --> api["Go API :8080"]
   api --> cases["Case service"]
   api --> processors["Processor registry"]
+  api --> exporter["Safe export and case state serializer"]
   cases --> fs["Filesystem storage"]
-  processors --> native["Tika, Tesseract, Pandoc, qpdf, ExifTool, Whisper.cpp, GDAL, llama.cpp adapters"]
+  processors --> native["Optional native tools: Tika, Tesseract, Pandoc, qpdf, ExifTool, Whisper.cpp, GDAL, llama.cpp"]
   api --> metrics["Prometheus /metrics"]
 ```
 
 ## Module Boundaries
 
-- `frontend`: `src/` plus Vite config, built into `docs/`.
-- `api`: OpenAPI contract consumed by generated frontend types.
+- `src/`: static React frontend, built into `docs/` for GitHub Pages.
+- `src/lib/api`: generated OpenAPI client types plus small boundary helpers.
+- `src/lib/session`: browser session preference storage and migration surface.
+- `api/openapi.yaml`: REST contract consumed by the frontend.
 - `cmd/server`: backend entrypoint and graceful shutdown.
 - `internal/httpapi`: routing, handlers, JSON responses, CORS, metrics.
-- `internal/pipeline`: processor registry and v1 extraction orchestration.
-- `internal/storage`: filesystem case, document, graph, timeline, and export storage.
+- `internal/pipeline`: evidence shape classification, inference, confidence, and processor-needed states.
+- `internal/exporter`: safe markdown export and portable case-state serialization.
+- `internal/storage`: filesystem case, document, export, and state import storage.
 - `deploy`: production Docker Compose, nginx, Prometheus, and run instructions.

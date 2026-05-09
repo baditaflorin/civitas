@@ -9,7 +9,7 @@ test("renders public project links, build metadata, and completed controls", () 
   });
   render(
     <QueryClientProvider client={client}>
-      <CivitasWorkspace appVersion="0.2.0" commit="abc1234" />
+      <CivitasWorkspace appVersion="0.3.0" commit="abc1234" />
     </QueryClientProvider>,
   );
 
@@ -21,7 +21,7 @@ test("renders public project links, build metadata, and completed controls", () 
     "href",
     "https://www.paypal.com/paypalme/florinbadita",
   );
-  expect(screen.getByText(/v0.2.0 · abc1234/i)).toBeInTheDocument();
+  expect(screen.getByText(/v0.3.0 · abc1234/i)).toBeInTheDocument();
   expect(screen.getByRole("button", { name: /start fresh/i })).toBeVisible();
   expect(screen.getByRole("button", { name: /upload paste/i })).toBeDisabled();
   expect(screen.getByRole("button", { name: /load sample/i })).toBeDisabled();

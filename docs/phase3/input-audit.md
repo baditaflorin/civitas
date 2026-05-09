@@ -2,31 +2,29 @@
 
 Date: 2026-05-10
 
-Scope: Civitas v0.2.0 live/workspace UI, API, README, ADRs, and tests.
+Scope: Civitas v0.2.0 before Phase 3 and Civitas v0.3.0 after Phase 3.
 
-Status key: Green = works fully on real user data. Yellow = works partially. Red = claimed or visible but broken/confusing. Gray = not built and not claimed.
+Status key: Green = works fully on real user data. Yellow = works partially. Red = claimed or visible but broken/confusing. Gray = not built and not claimed. Out = explicitly out of scope by ADR.
 
-| Input pathway | Status before | Evidence | User impact |
-| --- | --- | --- | --- |
-| Single file upload | Yellow | `input[type=file]` uploads one file to `/api/v1/cases/{case_id}/documents`; no reset, progress detail, or per-file result. | A stranger can upload one file after creating a case, but the flow is easy to miss and gives little feedback. |
-| Drag and drop | Gray | No drop target or drag handler. | Common desktop evidence workflow is absent. |
-| Paste text/HTML | Gray | No paste box or clipboard handler. | Users with copied FOIA text, article HTML, or email excerpts must create files manually. |
-| Paste image | Gray | No clipboard image handler. | Screenshot/photo evidence from clipboard cannot enter the system. |
-| URL input | Gray | No URL input. README does not claim direct fetching. | Acceptable if documented as out of scope because browser CORS would make it unreliable. |
-| Clipboard read button | Gray | No `navigator.clipboard` usage. | A paste box is safer and more predictable for v0.3.0 than a permission-heavy button. |
-| Mobile picker | Yellow | Native file input exists but lacks `multiple`, `accept`, or camera hints. | iOS/Android Files may work; multi-select and camera/photo workflows are not intentional. |
-| Multi-file upload | Gray | File input accepts one file and mutation accepts one `File`. | Real evidence dumps require repeated manual uploads. |
-| Folder upload | Gray | No `webkitdirectory`, no archive-as-folder UX. | Out of scope for v0.3.0; ZIP upload is the safer documented route. |
-| Sample/demo input | Red | Demo graph exists, but no one-click loadable evidence sample through the same upload flow. | The app looks demo-able, but the demo is not a real ingestion path. |
-| Deep links | Gray | No case/document route, hash state, or query handling. | Fine for v0.3.0 if not claimed; shareable app state is more important. |
-| Imported state | Gray | Markdown export exists, but no state import path. | Users cannot move work between backend instances or recover from a downloaded state file. |
-| Restored autosave/session | Yellow | API endpoint persists in `localStorage`; selected case and search term do not persist. Backend storage persists cases/documents. | A reload loses context and defaults to the newest case/search. |
-| Start fresh / clear state | Gray | No clear current session or delete/reset control. | A stranger has no obvious way to recover from a mistaken endpoint or old local UI state. |
+| Input pathway | Status before | Status after | Evidence | Outcome |
+| --- | --- | --- | --- | --- |
+| Single file upload | Yellow | Green | Existing file input now shares the same `uploadFiles` path and resets after selection. | A user can upload a single file and see upload feedback. |
+| Drag and drop | Gray | Green | Upload panel handles `dragover` and `drop`, then uploads dropped files. | Desktop evidence dumps can enter without the file picker. |
+| Paste text/HTML | Gray | Green | Paste box creates `pasted-evidence.txt` or `pasted-evidence.html` and sends it to the backend. | Copied articles, email excerpts, and FOIA text no longer require manual files. |
+| Paste image | Gray | Out | ADR 0061 keeps clipboard image read out of scope; image files are supported through upload/drop. | No misleading image-paste control is exposed. |
+| URL input | Gray | Out | ADR 0061 rejects direct browser URL fetching because CORS failures would be unpredictable. | Users are guided to paste rendered HTML/text or upload saved files. |
+| Clipboard read button | Gray | Out | ADR 0061 chooses the paste box instead of permission-heavy `navigator.clipboard` reads. | No fragile browser permission flow is exposed. |
+| Mobile picker | Yellow | Green | Standard `input[type=file][multiple]` remains available and works with mobile Files pickers. | Mobile users can select available files through the OS picker. |
+| Multi-file upload | Gray | Green | File input has `multiple`; smoke and unit paths use the batch upload helper with per-file progress text. | Evidence batches no longer require repeated manual single uploads. |
+| Folder upload | Gray | Out | ADR 0061 keeps folder upload out of scope; ZIP archives are the documented route. | No partial directory API support is implied. |
+| Sample/demo input | Red | Green | `Load sample` fetches `data/v1/sample.json` and uploads it through the same backend endpoint. | Demo and real input now exercise the same ingestion path. |
+| Deep links | Gray | Out | ADR 0061/0062 avoid URL-encoded case state because evidence can be sensitive. | No sensitive data is leaked through shareable URLs. |
+| Imported state | Gray | Green | Frontend validates `civitas.case_state.v1` JSON and posts it to `/api/v1/case-states/import`. | A downloaded investigation can be restored into a backend. |
+| Restored autosave/session | Yellow | Green | Endpoint, selected case id, and search term persist in `localStorage`. | Reload returns users to their working context. |
+| Start fresh / clear state | Gray | Green | Settings panel clears local endpoint/case/search state while leaving backend evidence intact. | Users can recover from stale local UI state. |
 
-## Input Findings
+## Input Summary
 
-1. Single-file upload exists but is the only real input path.
-2. Multi-file and paste are the highest-impact missing paths because they do not require engine changes.
-3. URL input should remain out of scope unless a backend fetch/proxy is designed; direct browser fetch would fail unpredictably on real sites.
-4. Demo data should be loaded through the same backend upload path, not remain only an SVG/graph placeholder.
-5. Session restore needs to persist selected case and search term in addition to the API endpoint.
+Before: 0 red-to-green paths, 4 yellow, 8 gray, 1 red.
+
+After: 9 green, 5 explicitly out of scope by ADR, 0 red, 0 yellow among claimed controls.
