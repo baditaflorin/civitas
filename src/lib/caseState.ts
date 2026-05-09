@@ -34,6 +34,12 @@ const stateImportSchema = z
   })
   .passthrough();
 
+const caseStateSchema = z.custom<CaseState>(
+  (value) => stateImportSchema.safeParse(value).success,
+  "Expected Civitas case state JSON.",
+);
+
 export function parseCaseState(raw: string): CaseState {
-  return stateImportSchema.parse(JSON.parse(raw)) as CaseState;
+  const parsedJson: unknown = JSON.parse(raw);
+  return caseStateSchema.parse(parsedJson);
 }

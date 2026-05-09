@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer";
 import { expect, test } from "@playwright/test";
 
 const apiBase = process.env.PLAYWRIGHT_API_BASE_URL ?? "http://127.0.0.1:18089";
@@ -47,4 +48,28 @@ test("fresh user creates a case, uploads pasted evidence, and exports", async ({
   await expect(page.getByRole("button", { name: /copy export/i })).toBeVisible();
   await expect(page.getByRole("button", { name: /download markdown/i })).toBeVisible();
   await expect(page.getByRole("button", { name: /download state/i })).toBeEnabled();
+
+  const stateSnippet = await page
+    .locator("pre")
+    .filter({ hasText: "/state > civitas-case-state.json" })
+    .textContent();
+  const caseId = stateSnippet?.match(/cases\/([^/]+)\/state/)?.[1];
+  expect(caseId).toBeTruthy();
+  const stateResponse = await page.request.get(
+    `${apiBase}/api/v1/cases/${caseId}/state`,
+  );
+  expect(stateResponse.ok()).toBeTruthy();
+  const state = await stateResponse.text();
+  const fileChooserPromise = page.waitForEvent("filechooser");
+  await page.getByText("Import state").click();
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles({
+    name: "stranger-workflow-state.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(state),
+  });
+  await expect(page.getByText(/Imported Stranger workflow/)).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /Stranger workflow \(imported\)/i }),
+  ).toBeVisible();
 });

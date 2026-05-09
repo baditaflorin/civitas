@@ -32,6 +32,10 @@ export function requireData<T>(
   return result.data;
 }
 
+export function multipartBody(form: FormData): never {
+  return form as never;
+}
+
 function hasMessage(value: unknown): value is { message: unknown } {
   return value !== null && typeof value === "object" && "message" in value;
 }

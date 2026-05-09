@@ -20,6 +20,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   apiError,
   createCivitasClient,
+  multipartBody,
   requireData,
   type CaseState,
   type VersionInfo,
@@ -65,8 +66,8 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
       if (!response.ok) {
         throw new Error("GitHub commit unavailable");
       }
-      const payload = (await response.json()) as { sha?: string };
-      return payload.sha?.slice(0, 7) ?? commit;
+      const payload: unknown = await response.json();
+      return hasSha(payload) ? payload.sha.slice(0, 7) : commit;
     },
     staleTime: 300_000,
   });
@@ -203,7 +204,7 @@ export function CivitasWorkspace({ appVersion, commit }: Props) {
       return requireData(
         await client.POST("/api/v1/cases/{case_id}/documents", {
           params: { path: { case_id: activeCaseId } },
-          body: form as never,
+          body: multipartBody(form),
         }),
         "Upload failed",
       );
@@ -748,4 +749,13 @@ function safeFilename(value: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
   return cleaned || "civitas";
+}
+
+function hasSha(value: unknown): value is { sha: string } {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    "sha" in value &&
+    typeof value.sha === "string"
+  );
 }
