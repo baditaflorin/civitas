@@ -52,7 +52,7 @@ flowchart LR
 
 - Direct URL scraping is not exposed in v0.3.0; paste rendered text/HTML or upload a saved file instead.
 - Folder upload is not exposed; ZIP the folder and upload the archive.
-- PDF text extraction, OCR, transcription, geospatial enrichment, face blurring, embeddings, and local LLM processing are represented honestly as processor states or future adapters unless the backend image is extended with those native tools.
+- PDF text extraction is built in (pure-Go, no native dependencies) and runs by default. OCR, transcription, geospatial enrichment, face blurring, embeddings, and local LLM processing are still represented as processor states or future adapters unless the backend image is extended with those native tools. Image-only (scanned) PDFs land in `needs_processor` with the OCR processor message.
 - Authentication is not built into v0.3.0; production deployments should protect the backend at the network/TLS layer.
 
 ## Documentation

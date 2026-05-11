@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"io"
 	"sort"
 	"strconv"
@@ -157,7 +158,7 @@ func analyzeHTML(docID, filename string, content []byte, shape string) analysisR
 }
 
 func analyzePDF(docID, filename string, content []byte) analysisResult {
-	if !bytes.HasPrefix(content, []byte("%PDF")) || !bytes.Contains(content, []byte("%%EOF")) || len(content) < 8192 {
+	if !bytes.HasPrefix(content, []byte("%PDF")) || !bytes.Contains(content, []byte("%%EOF")) || len(content) < 512 {
 		return analysisResult{
 			state:      "recoverable_error",
 			text:       "PDF evidence appears partial or corrupt.",
@@ -166,7 +167,32 @@ func analyzePDF(docID, filename string, content []byte) analysisResult {
 			anomalies:  []evidence.Anomaly{newAnomaly(docID, "pdf_truncated_or_corrupt", "error", "PDF appears truncated or corrupt.", "The file is missing a reliable PDF header/end marker or is too small for the expected document.", "Re-upload the original file or run qpdf repair before reprocessing.", 0.9)},
 		}
 	}
-	return processorNeeded(docID, filename, "pdf", "pdf_text_processor_unavailable", "PDF text extraction needs a document processor.", "Install or enable Tika, PyMuPDF, pdfminer, qpdf, or Ghostscript, then reprocess this PDF.", 0.74)
+	text, pages, err := extractPDFText(content)
+	switch {
+	case err == nil:
+		normalized := normalizeText(text)
+		return analysisResult{
+			state:      "ready",
+			text:       normalized,
+			preview:    preview(normalized),
+			confidence: 0.82,
+			fields: []evidence.FieldInference{
+				{Name: "pages", Value: strconv.Itoa(pages), Confidence: 0.95},
+			},
+		}
+	case errors.Is(err, errPDFNoText):
+		// Parsed fine, but no text layer — this is a scanned PDF and needs OCR.
+		return processorNeeded(docID, filename, "pdf", "ocr_processor_unavailable", "PDF has no text layer; OCR is required.", "Install or enable Tesseract or another OCR backend, then reprocess this PDF.", 0.7)
+	default:
+		// Parse error: the file is structurally a PDF but our parser cannot read it.
+		return analysisResult{
+			state:      "recoverable_error",
+			text:       "PDF could not be parsed: " + err.Error(),
+			preview:    "PDF could not be parsed.",
+			confidence: 0.7,
+			anomalies:  []evidence.Anomaly{newAnomaly(docID, "pdf_parse_failed", "error", "PDF parser rejected the file.", err.Error(), "Try repairing the file with qpdf, or re-export from the source application.", 0.85)},
+		}
+	}
 }
 
 func analyzeArchive(docID, filename string, content []byte) analysisResult {
